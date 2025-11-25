@@ -1,4 +1,4 @@
-FROM golang:1.24-alpine
+FROM golang:1.25-alpine
 ARG MINIO_VERSION=latest
 ARG MINIO_ROOT_USER=minioadmin
 ARG MINIO_ROOT_PASSWORD=minioadmin
