@@ -47,12 +47,11 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
         run: |
           go mod download
-          npm ci
+          npm install
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
