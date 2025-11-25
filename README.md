@@ -30,3 +30,4 @@ Open [http://localhost:8080](http://localhost:8080) and log in with your MinIO c
 
 - [Testing Guide](TESTING.md)
 - [Security](SECURITY.md)
+- [AI Agent Instructions](AGENTS.md)
