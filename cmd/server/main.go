@@ -35,7 +35,7 @@ func main() {
 	dashboardHandler := handlers.NewDashboardHandler(minioFactory)
 
 	// Middleware
-	e.Use(middleware.Logger())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{}))
 	e.Use(middleware.Recover())
 	// Apply auth middleware globally - it will skip public routes internally
 	e.Use(customMiddleware.AuthMiddleware(authService))

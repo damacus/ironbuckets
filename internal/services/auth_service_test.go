@@ -11,9 +11,6 @@ func TestNewAuthService_GeneratesKey(t *testing.T) {
 
 	svc := NewAuthService()
 
-	if svc == nil {
-		t.Fatal("expected non-nil AuthService")
-	}
 	if len(svc.encryptionKey) != 32 {
 		t.Errorf("expected 32-byte key, got %d bytes", len(svc.encryptionKey))
 	}
@@ -26,9 +23,6 @@ func TestNewAuthService_UsesEnvKey(t *testing.T) {
 
 	svc := NewAuthService()
 
-	if svc == nil {
-		t.Fatal("expected non-nil AuthService")
-	}
 	if string(svc.encryptionKey) != testKey {
 		t.Errorf("expected key %q, got %q", testKey, string(svc.encryptionKey))
 	}
@@ -40,9 +34,6 @@ func TestNewAuthService_IgnoresShortEnvKey(t *testing.T) {
 
 	svc := NewAuthService()
 
-	if svc == nil {
-		t.Fatal("expected non-nil AuthService")
-	}
 	// Should generate a new key since env key is too short
 	if len(svc.encryptionKey) != 32 {
 		t.Errorf("expected 32-byte generated key, got %d bytes", len(svc.encryptionKey))
