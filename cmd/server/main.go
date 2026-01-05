@@ -35,7 +35,14 @@ func main() {
 	dashboardHandler := handlers.NewDashboardHandler(minioFactory)
 
 	// Middleware
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{}))
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus: true,
+		LogURI:    true,
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			log.Printf("REQUEST: uri: %v, status: %v\n", v.URI, v.Status)
+			return nil
+		},
+	}))
 	e.Use(middleware.Recover())
 	// Apply auth middleware globally - it will skip public routes internally
 	e.Use(customMiddleware.AuthMiddleware(authService))
