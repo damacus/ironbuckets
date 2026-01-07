@@ -70,7 +70,7 @@
                             <div x-show="open" @click.away="open = false" x-cloak
                                  class="absolute right-0 mt-2 w-48 bg-surface border border-border rounded-lg shadow-lg z-50">
                                 <a href="/users/{{ $username }}/keys" class="block px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 flex items-center gap-2">
-                                    <i data-lucide="key" size="14"></i> Access Keys
+                                    <i data-lucide="key" size="14"></i> Service Accounts
                                 </a>
                                 <button
                                     hx-get="/users/{{ $username }}/policy/modal"

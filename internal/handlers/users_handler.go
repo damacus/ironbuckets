@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/damacus/iron-buckets/internal/services"
 	"github.com/labstack/echo/v4"
@@ -218,17 +219,28 @@ func (h *UsersHandler) CreateServiceAccount(c echo.Context) error {
 	accessKey := c.Param("accessKey")
 	name := c.FormValue("name")
 	description := c.FormValue("description")
+	expiry := c.FormValue("expiry")
 
 	mdm, err := h.minioFactory.NewAdminClient(*creds)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to connect to MinIO")
 	}
 
-	newCreds, err := mdm.AddServiceAccount(c.Request().Context(), madmin.AddServiceAccountReq{
+	req := madmin.AddServiceAccountReq{
 		TargetUser:  accessKey,
 		Name:        name,
 		Description: description,
-	})
+	}
+
+	if expiry != "" {
+		dur, err := time.ParseDuration(expiry)
+		if err == nil {
+			exp := time.Now().Add(dur)
+			req.Expiration = &exp
+		}
+	}
+
+	newCreds, err := mdm.AddServiceAccount(c.Request().Context(), req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create service account: "+err.Error())
 	}

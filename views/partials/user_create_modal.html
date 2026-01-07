@@ -1,38 +1,77 @@
 {{ define "user_create_modal" }}
-<div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" id="user-modal" onclick="if(event.target === this) this.remove()">
-    <div class="bg-surface border border-border rounded-xl p-6 w-full max-w-md shadow-2xl relative animate-in fade-in zoom-in duration-200">
-        <button class="absolute top-4 right-4 text-zinc-500 hover:text-white" onclick="document.getElementById('user-modal').remove()">
-            <i data-lucide="x" size="20"></i>
+<div
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+  id="user-modal"
+  onclick="if(event.target === this) this.remove()"
+>
+  <div
+    class="bg-surface border border-border rounded-xl p-6 w-full max-w-md shadow-2xl relative animate-in fade-in zoom-in duration-200"
+  >
+    <button
+      class="absolute top-4 right-4 text-zinc-500 hover:text-white"
+      onclick="document.getElementById('user-modal').remove()"
+    >
+      <i data-lucide="x" size="20"></i>
+    </button>
+
+    <h3 class="text-lg font-bold text-white mb-4">Add New User</h3>
+
+    <form hx-post="/users/create" hx-target="#user-modal" hx-swap="outerHTML">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-zinc-400 mb-1"
+            >Username</label
+          >
+          <input
+            name="accessKey"
+            type="text"
+            required
+            class="w-full bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-white focus:border-emerald-500 focus:outline-none"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-zinc-400 mb-1"
+            >Password</label
+          >
+          <input
+            name="secretKey"
+            type="password"
+            required
+            class="w-full bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-white focus:border-emerald-500 focus:outline-none"
+          />
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="block text-sm font-medium text-zinc-400">Policy</label>
+          <select
+            name="policy"
+            class="bg-zinc-900 border border-zinc-700 rounded-md px-3 py-1 text-sm text-white focus:border-emerald-500"
+          >
+            <option value="readwrite">readwrite</option>
+            <option value="consoleAdmin">consoleAdmin</option>
+            <option value="readonly">readonly</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button
+          type="button"
+          onclick="document.getElementById('user-modal').remove()"
+          class="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white"
+        >
+          Cancel
         </button>
-
-        <h3 class="text-lg font-bold text-white mb-4">Add New User</h3>
-
-        <form hx-post="/users/create" hx-target="#user-modal" hx-swap="outerHTML">
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-zinc-400 mb-1">Access Key (Username)</label>
-                    <input name="accessKey" type="text" required class="w-full bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-white focus:border-emerald-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-zinc-400 mb-1">Secret Key (Password)</label>
-                    <input name="secretKey" type="password" required class="w-full bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-white focus:border-emerald-500 focus:outline-none">
-                </div>
-                <div class="flex items-center gap-2">
-                     <label class="block text-sm font-medium text-zinc-400">Policy</label>
-                     <select name="policy" class="bg-zinc-900 border border-zinc-700 rounded-md px-3 py-1 text-sm text-white focus:border-emerald-500">
-                        <option value="readwrite">readwrite</option>
-                        <option value="consoleAdmin">consoleAdmin</option>
-                        <option value="readonly">readonly</option>
-                     </select>
-                </div>
-            </div>
-
-            <div class="mt-6 flex justify-end gap-3">
-                <button type="button" onclick="document.getElementById('user-modal').remove()" class="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white">Cancel</button>
-                <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md text-sm font-medium">Create User</button>
-            </div>
-        </form>
-    </div>
-    <script>lucide.createIcons();</script>
+        <button
+          type="submit"
+          class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md text-sm font-medium"
+        >
+          Create User
+        </button>
+      </div>
+    </form>
+  </div>
+  <script>
+    lucide.createIcons();
+  </script>
 </div>
 {{ end }}

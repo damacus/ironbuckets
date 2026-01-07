@@ -77,24 +77,15 @@
     <!-- Main Content -->
     <main class="flex-1 flex flex-col min-w-0 overflow-hidden" x-data="objectBrowser()" x-init="init()">
         <!-- Header -->
-        <header class="h-16 border-b border-border bg-surface/50 backdrop-blur-sm flex items-center justify-between px-8">
-            <div class="flex items-center gap-4">
-                <a href="/buckets" class="text-zinc-400 hover:text-white">
-                    <i data-lucide="arrow-left" size="20"></i>
-                </a>
-                <!-- Breadcrumb Navigation -->
-                <nav class="flex items-center gap-2 text-sm">
-                    <a href="/buckets/{{ .BucketName }}" class="text-zinc-400 hover:text-white flex items-center gap-1">
-                        <i data-lucide="container" size="16"></i>
-                        {{ .BucketName }}
+        <header class="border-b border-border bg-surface/50 backdrop-blur-sm">
+            <div class="h-16 flex items-center justify-between px-8">
+                <div class="flex items-center gap-4">
+                    <a href="/buckets" class="text-zinc-400 hover:text-white">
+                        <i data-lucide="arrow-left" size="20"></i>
                     </a>
-                    {{ range .Breadcrumbs }}
-                    <span class="text-zinc-600">/</span>
-                    <a href="/buckets/{{ $.BucketName }}?prefix={{ .Path }}" class="text-zinc-400 hover:text-white">{{ .Name }}</a>
-                    {{ end }}
-                </nav>
-            </div>
-            <div class="flex items-center gap-3">
+                    <h1 class="text-lg font-semibold text-white">{{ .BucketName }}</h1>
+                </div>
+                <div class="flex items-center gap-3">
                 <!-- Search -->
                 <div class="relative">
                     <input
@@ -136,7 +127,19 @@
                     class="hidden">
                     <input type="file" name="file" id="upload-input" multiple onchange="htmx.trigger('#upload-form', 'submit')">
                 </form>
+                </div>
             </div>
+            <!-- Breadcrumb Navigation -->
+            <nav class="flex items-center gap-2 text-sm px-8 py-2 border-t border-border/50 bg-zinc-900/30 overflow-x-auto">
+                <a href="/buckets/{{ .BucketName }}" class="text-zinc-400 hover:text-white flex items-center gap-1 shrink-0">
+                    <i data-lucide="container" size="14"></i>
+                    <span>{{ .BucketName }}</span>
+                </a>
+                {{ range .Breadcrumbs }}
+                <span class="text-zinc-600 shrink-0">/</span>
+                <a href="/buckets/{{ $.BucketName }}?prefix={{ .Path }}" class="text-zinc-400 hover:text-white shrink-0">{{ .Name }}</a>
+                {{ end }}
+            </nav>
         </header>
 
         <!-- Bulk Actions Bar -->

@@ -49,9 +49,35 @@ func (h *BucketsHandler) ListBuckets(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to list buckets")
 	}
 
+	// Fetch Data Usage for sizes
+	mdm, err := h.minioFactory.NewAdminClient(*creds)
+	var usage madmin.DataUsageInfo
+	if err == nil {
+		usage, _ = mdm.DataUsageInfo(c.Request().Context())
+	}
+
+	type BucketWithStats struct {
+		minio.BucketInfo
+		Size          uint64
+		FormattedSize string
+	}
+
+	var bucketsWithStats []BucketWithStats
+	for _, b := range buckets {
+		size := uint64(0)
+		if usage.BucketSizes != nil {
+			size = usage.BucketSizes[b.Name]
+		}
+		bucketsWithStats = append(bucketsWithStats, BucketWithStats{
+			BucketInfo:    b,
+			Size:          size,
+			FormattedSize: utils.FormatBytes(size),
+		})
+	}
+
 	return c.Render(http.StatusOK, "buckets", map[string]interface{}{
 		"ActiveNav": "buckets",
-		"Buckets":   buckets,
+		"Buckets":   bucketsWithStats,
 	})
 }
 

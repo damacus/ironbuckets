@@ -59,6 +59,10 @@
                 <div class="text-sm text-zinc-500">
                     Created {{ .CreationDate.Format "Jan 2, 2006" }}
                 </div>
+                <div class="mt-2">
+                    <span class="text-xs font-medium text-zinc-500 uppercase tracking-wider">Size</span>
+                    <div class="text-lg font-semibold text-white">{{ .FormattedSize }}</div>
+                </div>
             </a>
         </div>
         {{ end }}
