@@ -16,6 +16,7 @@ import (
 	"github.com/damacus/iron-buckets/internal/middleware"
 	"github.com/damacus/iron-buckets/internal/services"
 	"github.com/labstack/echo/v4"
+	"github.com/minio/madmin-go/v3"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/lifecycle"
 	"github.com/minio/minio-go/v7/pkg/notification"
@@ -35,11 +36,15 @@ func TestBucketJourney(t *testing.T) {
 	// Pre-login the mock factory
 	creds := services.Credentials{Endpoint: "play.minio.io:9000", AccessKey: "admin", SecretKey: "password"}
 	mockFactory.On("NewClient", creds).Return(mockClient, nil)
+	mockFactory.On("NewAdminClient", creds).Return(mockClient, nil)
 
 	// Mock Bucket Operations
 	mockClient.On("ListBuckets", mock.Anything).Return([]minio.BucketInfo{
 		{Name: "bucket-1", CreationDate: time.Now()},
 		{Name: "bucket-2", CreationDate: time.Now()},
+	}, nil)
+	mockClient.On("DataUsageInfo", mock.Anything).Return(madmin.DataUsageInfo{
+		BucketSizes: map[string]uint64{"bucket-1": 1024, "bucket-2": 2048},
 	}, nil)
 	mockClient.On("MakeBucket", mock.Anything, "newbucket", mock.Anything).Return(nil)
 	mockClient.On("RemoveBucket", mock.Anything, "newbucket").Return(nil)
