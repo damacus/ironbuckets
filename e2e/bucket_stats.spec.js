@@ -105,7 +105,7 @@ test.describe('Bucket Stats', () => {
 		console.log('Initial state verified');
 
 		// 2. Navigate to bucket and upload file
-		await page.locator(`a[href="/buckets/${testBucket}"]`).filter({ visible: true }).click();
+		await page.locator(`.group`).filter({ hasText: testBucket }).locator('a.block').filter({ hasText: testBucket }).click();
 		await page.waitForURL(`${APP_URL}/buckets/${testBucket}`);
 		console.log('Navigated to bucket');
 
