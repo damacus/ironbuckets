@@ -87,8 +87,8 @@ test.describe('Object Browser', () => {
     await page.waitForURL(`${APP_URL}/buckets`, { timeout: 5000 });
     await expect(page.getByText(testBucket)).toBeVisible();
 
-    // Click on the bucket to open object browser (use visible link, not dropdown)
-    await page.locator(`a[href="/buckets/${testBucket}"]`).filter({ visible: true }).click();
+    // Click on the bucket to open object browser (use the card link with bucket name)
+    await page.locator(`.group`).filter({ hasText: testBucket }).locator('a.block').filter({ hasText: testBucket }).click();
     await page.waitForURL(`${APP_URL}/buckets/${testBucket}`);
 
     // Verify object browser elements
@@ -107,8 +107,8 @@ test.describe('Object Browser', () => {
     await page.click('#bucket-modal button[type="submit"]');
     await page.waitForURL(`${APP_URL}/buckets`, { timeout: 5000 });
 
-    // Open the bucket (use visible link, not dropdown)
-    await page.locator(`a[href="/buckets/${testBucket}"]`).filter({ visible: true }).click();
+    // Open the bucket (use the card link with bucket name)
+    await page.locator(`.group`).filter({ hasText: testBucket }).locator('a.block').filter({ hasText: testBucket }).click();
     await page.waitForURL(`${APP_URL}/buckets/${testBucket}`);
 
     // Create a folder using the New Folder button
@@ -139,8 +139,8 @@ test.describe('Object Browser', () => {
     await page.click('#bucket-modal button[type="submit"]');
     await page.waitForURL(`${APP_URL}/buckets`, { timeout: 5000 });
 
-    // Open the bucket (use visible link, not dropdown)
-    await page.locator(`a[href="/buckets/${testBucket}"]`).filter({ visible: true }).click();
+    // Open the bucket (use the card link with bucket name)
+    await page.locator(`.group`).filter({ hasText: testBucket }).locator('a.block').filter({ hasText: testBucket }).click();
     await page.waitForURL(`${APP_URL}/buckets/${testBucket}`);
 
     // Create level1 folder
@@ -183,8 +183,8 @@ test.describe('Object Browser', () => {
     await page.click('#bucket-modal button[type="submit"]');
     await page.waitForURL(`${APP_URL}/buckets`, { timeout: 5000 });
 
-    // Open the bucket (use visible link, not dropdown)
-    await page.locator(`a[href="/buckets/${testBucket}"]`).filter({ visible: true }).click();
+    // Open the bucket (use the card link with bucket name)
+    await page.locator(`.group`).filter({ hasText: testBucket }).locator('a.block').filter({ hasText: testBucket }).click();
     await page.waitForURL(`${APP_URL}/buckets/${testBucket}`);
 
     // Create a folder
