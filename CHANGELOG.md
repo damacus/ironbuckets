@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/damacus/ironbuckets/compare/v1.1.0...v1.2.0) (2026-01-10)
+
+
+### Features
+
+* Bucket Stats ([#5](https://github.com/damacus/ironbuckets/issues/5)) ([e0812d2](https://github.com/damacus/ironbuckets/commit/e0812d2b8beec2d8b3fcf2d0cb10c5ab07e11826))
+
 ## [1.1.0](https://github.com/damacus/ironbuckets/compare/v1.0.0...v1.1.0) (2025-12-15)
 
 
