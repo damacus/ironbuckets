@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/damacus/ironbuckets/compare/v1.2.0...v1.2.1) (2026-01-14)
+
+
+### Bug Fixes
+
+* Fix tests ([#7](https://github.com/damacus/ironbuckets/issues/7)) ([70613f1](https://github.com/damacus/ironbuckets/commit/70613f104c1ec02638b897341e826c0121ab0c7c))
+
 ## [1.2.0](https://github.com/damacus/ironbuckets/compare/v1.1.0...v1.2.0) (2026-01-10)
 
 
