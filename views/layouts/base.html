@@ -1,6 +1,7 @@
 {{ define "base" }}
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,81 +35,108 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
         /* Showing HTMX attributes for visualization only */
-        .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; }
-        .htmx-request .htmx-indicator { opacity: 1; }
-        [x-cloak] { display: none !important; }
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 200ms ease-in;
+        }
+
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
-<body class="bg-background text-zinc-100 h-screen w-screen flex overflow-hidden" x-data="{ collapsed: false }">
+
+<body class="bg-background text-zinc-100 h-screen w-screen flex overflow-hidden" x-data="{ collapsed: false }"
+    hx-boost="true" hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML">
 
     <!-- SIDEBAR -->
-    <div
-        class="border-r border-border bg-surface flex flex-col transition-all duration-300 ease-in-out w-64"
-        :class="collapsed ? '!w-20' : ''"
-    >
+    <div class="border-r border-border bg-surface flex flex-col transition-all duration-300 ease-in-out w-64"
+        :class="collapsed ? '!w-20' : ''">
         <div class="p-6 flex items-center gap-3 border-b border-border/50 overflow-hidden whitespace-nowrap">
-            <div class="w-8 h-8 bg-zinc-100 rounded-lg flex-shrink-0 flex items-center justify-center cursor-pointer" @click="collapsed = !collapsed">
+            <div class="w-8 h-8 bg-zinc-100 rounded-lg flex-shrink-0 flex items-center justify-center cursor-pointer"
+                @click="collapsed = !collapsed">
                 <i data-lucide="box" class="text-black"></i>
             </div>
-            <span class="font-bold text-lg tracking-tight transition-opacity duration-300 opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">IronBuckets</span>
+            <span class="font-bold text-lg tracking-tight transition-opacity duration-300 opacity-100"
+                :class="collapsed ? '!opacity-0 !w-0' : ''">IronBuckets</span>
         </div>
 
         <div class="flex-1 py-6 px-3 space-y-1 overflow-y-auto overflow-x-hidden">
 
             <!-- Section Header -->
             <div class="px-3 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2 transition-opacity duration-300 whitespace-nowrap opacity-100"
-                 :class="collapsed ? '!opacity-0 !h-0 !overflow-hidden !mb-0' : ''">
-                 Cluster
+                :class="collapsed ? '!opacity-0 !h-0 !overflow-hidden !mb-0' : ''">
+                Cluster
             </div>
 
             <!-- Nav Items -->
-            <a href="/" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "overview" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+            <a href="/"
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
+                overview" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="activity" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Overview</span>
             </a>
 
-            <a href="/drives" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "drives" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+            <a href="/drives"
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
+                drives" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="hard-drive" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Drives</span>
             </a>
 
             <!-- Section Header -->
             <div class="px-3 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2 mt-6 transition-opacity duration-300 whitespace-nowrap opacity-100"
-                 :class="collapsed ? '!opacity-0 !h-0 !overflow-hidden !mt-2 !mb-0' : ''">
-                 Access
+                :class="collapsed ? '!opacity-0 !h-0 !overflow-hidden !mt-2 !mb-0' : ''">
+                Access
             </div>
 
-            <a href="/users" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "users" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+            <a href="/users"
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
+                users" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="user" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Users</span>
             </a>
 
-            <a href="/groups" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "groups" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+            <a href="/groups"
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
+                groups" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="users" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Groups</span>
             </a>
 
-            <a href="/buckets" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "buckets" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+            <a href="/buckets"
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
+                buckets" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="container" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Buckets</span>
             </a>
 
             <!-- Section Header -->
             <div class="px-3 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2 mt-6 transition-opacity duration-300 whitespace-nowrap opacity-100"
-                 :class="collapsed ? '!opacity-0 !h-0 !overflow-hidden !mt-2 !mb-0' : ''">
-                 System
+                :class="collapsed ? '!opacity-0 !h-0 !overflow-hidden !mt-2 !mb-0' : ''">
+                System
             </div>
 
-            <a href="/settings" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "settings" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+            <a href="/settings"
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
+                settings" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="settings" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Settings</span>
             </a>
 
             <!-- Logout at bottom -->
             <div class="mt-auto pt-4 border-t border-border">
-                <a href="/logout" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap text-zinc-400 hover:text-red-400 hover:bg-red-500/10">
+                <a href="/logout" hx-boost="false"
+                    class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap text-zinc-400 hover:text-red-400 hover:bg-red-500/10">
                     <i data-lucide="log-out" size="18" class="flex-shrink-0"></i>
                     <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Logout</span>
                 </a>
@@ -117,17 +145,19 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col min-w-0 bg-background overflow-auto">
+    <main id="main-content" class="flex-1 flex flex-col min-w-0 bg-background overflow-auto">
         <!-- Header -->
-        <header class="h-16 border-b border-border flex items-center justify-between px-8 bg-background/50 backdrop-blur-sm sticky top-0 z-10">
+        <header
+            class="h-16 border-b border-border flex items-center justify-between px-8 bg-background/50 backdrop-blur-sm sticky top-0 z-10">
             <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span class="text-sm font-medium text-zinc-300">Cluster Online</span>
-                <span class="text-xs text-zinc-500 ml-2" hx-get="/api/server/version" hx-trigger="load" hx-swap="innerHTML"></span>
+                <span class="text-xs text-zinc-500 ml-2" hx-get="/api/server/version" hx-trigger="load"
+                    hx-swap="innerHTML"></span>
             </div>
             <!-- Right side items if needed -->
             <div class="flex items-center gap-4">
-                 <!-- Removed Restart Button, moved to Settings -->
+                <!-- Removed Restart Button, moved to Settings -->
             </div>
         </header>
 
@@ -145,10 +175,40 @@
         lucide.createIcons();
 
         // Re-init icons on HTMX content swaps
-        document.body.addEventListener('htmx:afterSwap', function(evt) {
+        document.body.addEventListener('htmx:afterSwap', function (evt) {
             lucide.createIcons();
+        });
+
+        // Update sidebar active state on navigation
+        document.body.addEventListener('htmx:pushedIntoHistory', function (evt) {
+            const path = window.location.pathname;
+            const links = document.querySelectorAll('.sidebar-nav-link');
+
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                // Simple exact match or startswith for sub-paths if needed. 
+                // For now, exact match or /users matching /users/create is good practice, 
+                // but let's stick to exact logic or simple logic matching the Go template:
+                // Go template used exact match mostly.
+
+                let isActive = false;
+                if (href === '/' && path === '/') {
+                    isActive = true;
+                } else if (href !== '/' && path.startsWith(href)) {
+                    isActive = true;
+                }
+
+                if (isActive) {
+                    link.classList.remove('text-zinc-400', 'hover:text-white', 'hover:bg-white/5');
+                    link.classList.add('bg-white/10', 'text-white');
+                } else {
+                    link.classList.add('text-zinc-400', 'hover:text-white', 'hover:bg-white/5');
+                    link.classList.remove('bg-white/10', 'text-white');
+                }
+            });
         });
     </script>
 </body>
+
 </html>
 {{ end }}
