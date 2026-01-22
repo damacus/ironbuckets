@@ -80,15 +80,13 @@
 
             <!-- Nav Items -->
             <a href="/"
-                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
-                overview" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "overview" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="activity" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Overview</span>
             </a>
 
             <a href="/drives"
-                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
-                drives" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "drives" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="hard-drive" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Drives</span>
             </a>
@@ -100,22 +98,19 @@
             </div>
 
             <a href="/users"
-                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
-                users" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "users" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="user" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Users</span>
             </a>
 
             <a href="/groups"
-                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
-                groups" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "groups" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="users" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Groups</span>
             </a>
 
             <a href="/buckets"
-                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
-                buckets" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "buckets" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="container" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Buckets</span>
             </a>
@@ -127,8 +122,7 @@
             </div>
 
             <a href="/settings"
-                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "
-                settings" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
+                class="sidebar-nav-link w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap {{ if eq .ActiveNav "settings" }}bg-white/10 text-white{{ else }}text-zinc-400 hover:text-white hover:bg-white/5{{ end }}">
                 <i data-lucide="settings" size="18" class="flex-shrink-0"></i>
                 <span class="opacity-100" :class="collapsed ? '!opacity-0 !w-0' : ''">Settings</span>
             </a>
@@ -186,8 +180,8 @@
 
             links.forEach(link => {
                 const href = link.getAttribute('href');
-                // Simple exact match or startswith for sub-paths if needed. 
-                // For now, exact match or /users matching /users/create is good practice, 
+                // Simple exact match or startswith for sub-paths if needed.
+                // For now, exact match or /users matching /users/create is good practice,
                 // but let's stick to exact logic or simple logic matching the Go template:
                 // Go template used exact match mostly.
 
