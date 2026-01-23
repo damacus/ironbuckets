@@ -109,9 +109,13 @@ func TestObjectBrowserJourney(t *testing.T) {
 	creds := services.Credentials{Endpoint: "play.minio.io:9000", AccessKey: "admin", SecretKey: "password"}
 	mockFactory.On("NewClient", creds).Return(mockClient, nil)
 
-	// Mock Object Operations
-	mockClient.On("ListObjects", mock.Anything, "my-bucket", mock.Anything).Return([]minio.ObjectInfo{
-		{Key: "file1.txt", Size: 123, LastModified: time.Now()},
+	// Mock Object Operations - use ListObjectsPaginated for BrowseBucket
+	mockClient.On("ListObjectsPaginated", mock.Anything, "my-bucket", mock.Anything).Return(services.ListObjectsResult{
+		Objects: []minio.ObjectInfo{
+			{Key: "file1.txt", Size: 123, LastModified: time.Now()},
+		},
+		IsTruncated:           false,
+		NextContinuationToken: "",
 	}, nil)
 	mockClient.On("PutObject", mock.Anything, "my-bucket", "testfile.txt", mock.Anything, mock.Anything, mock.Anything).Return(minio.UploadInfo{}, nil)
 
@@ -161,14 +165,16 @@ func TestZipDownloadJourney(t *testing.T) {
 	creds := services.Credentials{Endpoint: "play.minio.io:9000", AccessKey: "admin", SecretKey: "password"}
 	mockFactory.On("NewClient", creds).Return(mockClient, nil)
 
-	// Mock listing objects in a folder
-	mockClient.On("ListObjects", mock.Anything, "my-bucket", mock.MatchedBy(func(opts minio.ListObjectsOptions) bool {
+	// Mock listing objects in a folder using channel-based streaming
+	objectsChan := make(chan minio.ObjectInfo, 3)
+	objectsChan <- minio.ObjectInfo{Key: "folder/file1.txt", Size: 13, LastModified: time.Now()}
+	objectsChan <- minio.ObjectInfo{Key: "folder/file2.txt", Size: 13, LastModified: time.Now()}
+	objectsChan <- minio.ObjectInfo{Key: "folder/subfolder/file3.txt", Size: 17, LastModified: time.Now()}
+	close(objectsChan)
+
+	mockClient.On("ListObjectsChannel", mock.Anything, "my-bucket", mock.MatchedBy(func(opts minio.ListObjectsOptions) bool {
 		return opts.Prefix == "folder/" && opts.Recursive == true
-	})).Return([]minio.ObjectInfo{
-		{Key: "folder/file1.txt", Size: 13, LastModified: time.Now()},
-		{Key: "folder/file2.txt", Size: 13, LastModified: time.Now()},
-		{Key: "folder/subfolder/file3.txt", Size: 17, LastModified: time.Now()},
-	}, nil)
+	})).Return((<-chan minio.ObjectInfo)(objectsChan))
 
 	// Mock getting each object's content
 	mockClient.On("GetObjectReader", mock.Anything, "my-bucket", "folder/file1.txt", mock.Anything).

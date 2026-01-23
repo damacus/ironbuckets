@@ -17,6 +17,24 @@ import (
 	"github.com/minio/minio-go/v7/pkg/tags"
 )
 
+// DefaultPageSize is the default number of objects to return per page
+const DefaultPageSize = 100
+
+// ListObjectsOptions extends minio.ListObjectsOptions with pagination
+type ListObjectsOptions struct {
+	Prefix            string
+	Recursive         bool
+	MaxKeys           int
+	ContinuationToken string
+}
+
+// ListObjectsResult contains paginated results from ListObjectsPaginated
+type ListObjectsResult struct {
+	Objects               []minio.ObjectInfo
+	IsTruncated           bool
+	NextContinuationToken string
+}
+
 // MinioAdminClient is an interface for the madmin methods we use
 type MinioAdminClient interface {
 	ServerInfo(ctx context.Context, opts ...func(*madmin.ServerInfoOpts)) (madmin.InfoMessage, error)
@@ -60,6 +78,8 @@ type MinioClient interface {
 
 	// Object Operations
 	ListObjects(ctx context.Context, bucketName string, opts minio.ListObjectsOptions) ([]minio.ObjectInfo, error)
+	ListObjectsPaginated(ctx context.Context, bucketName string, opts ListObjectsOptions) (ListObjectsResult, error)
+	ListObjectsChannel(ctx context.Context, bucketName string, opts minio.ListObjectsOptions) <-chan minio.ObjectInfo
 	PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64, opts minio.PutObjectOptions) (minio.UploadInfo, error)
 	GetObject(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (*minio.Object, error)
 	GetObjectReader(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (io.ReadCloser, int64, error)
@@ -122,6 +142,55 @@ func (c *WrappedMinioClient) ListObjects(ctx context.Context, bucketName string,
 		objects = append(objects, obj)
 	}
 	return objects, nil
+}
+
+func (c *WrappedMinioClient) ListObjectsPaginated(ctx context.Context, bucketName string, opts ListObjectsOptions) (ListObjectsResult, error) {
+	maxKeys := opts.MaxKeys
+	if maxKeys <= 0 {
+		maxKeys = DefaultPageSize
+	}
+
+	minioOpts := minio.ListObjectsOptions{
+		Prefix:    opts.Prefix,
+		Recursive: opts.Recursive,
+	}
+
+	// Use StartAfter for continuation (MinIO uses marker-based pagination)
+	if opts.ContinuationToken != "" {
+		minioOpts.StartAfter = opts.ContinuationToken
+	}
+
+	var objects []minio.ObjectInfo
+	var lastKey string
+
+	for obj := range c.client.ListObjects(ctx, bucketName, minioOpts) {
+		if obj.Err != nil {
+			return ListObjectsResult{}, obj.Err
+		}
+
+		objects = append(objects, obj)
+		lastKey = obj.Key
+
+		// Stop after maxKeys objects
+		if len(objects) >= maxKeys {
+			break
+		}
+	}
+
+	result := ListObjectsResult{
+		Objects:     objects,
+		IsTruncated: len(objects) >= maxKeys,
+	}
+
+	if result.IsTruncated {
+		result.NextContinuationToken = lastKey
+	}
+
+	return result, nil
+}
+
+func (c *WrappedMinioClient) ListObjectsChannel(ctx context.Context, bucketName string, opts minio.ListObjectsOptions) <-chan minio.ObjectInfo {
+	return c.client.ListObjects(ctx, bucketName, opts)
 }
 
 func (c *WrappedMinioClient) PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64, opts minio.PutObjectOptions) (minio.UploadInfo, error) {

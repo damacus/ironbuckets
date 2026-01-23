@@ -152,7 +152,7 @@ func (h *BucketsHandler) DeleteBucket(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-// BrowseBucket renders the object browser with folder support
+// BrowseBucket renders the object browser with folder support and pagination
 func (h *BucketsHandler) BrowseBucket(c echo.Context) error {
 	creds, err := GetCredentialsOrRedirect(c)
 	if err != nil {
@@ -161,16 +161,19 @@ func (h *BucketsHandler) BrowseBucket(c echo.Context) error {
 
 	bucketName := c.Param("bucketName")
 	prefix := c.QueryParam("prefix")
+	continuationToken := c.QueryParam("continuation")
 
 	client, err := h.minioFactory.NewClient(*creds)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to connect to MinIO")
 	}
 
-	// List objects with prefix for folder support
-	rawObjects, err := client.ListObjects(c.Request().Context(), bucketName, minio.ListObjectsOptions{
-		Prefix:    prefix,
-		Recursive: false, // Non-recursive to get folders
+	// List objects with pagination to limit memory usage
+	result, err := client.ListObjectsPaginated(c.Request().Context(), bucketName, services.ListObjectsOptions{
+		Prefix:            prefix,
+		Recursive:         false, // Non-recursive to get folders
+		MaxKeys:           services.DefaultPageSize,
+		ContinuationToken: continuationToken,
 	})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to list objects")
@@ -180,7 +183,7 @@ func (h *BucketsHandler) BrowseBucket(c echo.Context) error {
 	var folders []models.FolderInfo
 	seenFolders := make(map[string]bool)
 
-	for _, obj := range rawObjects {
+	for _, obj := range result.Objects {
 		// Check if it's a folder (ends with /)
 		if strings.HasSuffix(obj.Key, "/") {
 			folderName := strings.TrimPrefix(obj.Key, prefix)
@@ -235,12 +238,14 @@ func (h *BucketsHandler) BrowseBucket(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "browser", map[string]interface{}{
-		"ActiveNav":   "buckets",
-		"BucketName":  bucketName,
-		"Prefix":      prefix,
-		"Objects":     objects,
-		"Folders":     folders,
-		"Breadcrumbs": breadcrumbs,
+		"ActiveNav":             "buckets",
+		"BucketName":            bucketName,
+		"Prefix":                prefix,
+		"Objects":               objects,
+		"Folders":               folders,
+		"Breadcrumbs":           breadcrumbs,
+		"HasMore":               result.IsTruncated,
+		"NextContinuationToken": result.NextContinuationToken,
 	})
 }
 
@@ -387,7 +392,7 @@ func (h *BucketsHandler) CreateFolder(c echo.Context) error {
 	return HTMXRedirect(c, "/buckets/"+bucketName+"?prefix="+prefix)
 }
 
-// DeleteFolder deletes a folder and all its contents
+// DeleteFolder deletes a folder and all its contents using streaming
 func (h *BucketsHandler) DeleteFolder(c echo.Context) error {
 	creds, err := GetCredentials(c)
 	if err != nil {
@@ -402,17 +407,17 @@ func (h *BucketsHandler) DeleteFolder(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to connect to MinIO")
 	}
 
-	// List all objects with this prefix
-	objectsList, err := client.ListObjects(c.Request().Context(), bucketName, minio.ListObjectsOptions{
+	// Stream objects and delete one at a time to avoid loading all into memory
+	objectsChan := client.ListObjectsChannel(c.Request().Context(), bucketName, minio.ListObjectsOptions{
 		Prefix:    prefix,
 		Recursive: true,
 	})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to list objects")
-	}
 
-	// Delete all objects
-	for _, obj := range objectsList {
+	// Delete objects as they stream in
+	for obj := range objectsChan {
+		if obj.Err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to list objects: "+obj.Err.Error())
+		}
 		err := client.RemoveObject(c.Request().Context(), bucketName, obj.Key, minio.RemoveObjectOptions{})
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to delete object: "+obj.Key)
@@ -422,7 +427,7 @@ func (h *BucketsHandler) DeleteFolder(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-// DownloadZip streams a folder as a ZIP archive
+// DownloadZip streams a folder as a ZIP archive using streaming object listing
 func (h *BucketsHandler) DownloadZip(c echo.Context) error {
 	creds, err := GetCredentialsOrRedirect(c)
 	if err != nil {
@@ -437,31 +442,9 @@ func (h *BucketsHandler) DownloadZip(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to connect to MinIO")
 	}
 
-	// List all objects with this prefix recursively
-	objectsList, err := client.ListObjects(c.Request().Context(), bucketName, minio.ListObjectsOptions{
-		Prefix:    prefix,
-		Recursive: true,
-	})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to list objects")
-	}
-
-	// Filter out folder markers (objects ending with /)
-	var files []minio.ObjectInfo
-	for _, obj := range objectsList {
-		if !strings.HasSuffix(obj.Key, "/") {
-			files = append(files, obj)
-		}
-	}
-
-	if len(files) == 0 {
-		return echo.NewHTTPError(http.StatusNotFound, "No files to download")
-	}
-
 	// Determine ZIP filename from prefix or bucket name
 	zipName := bucketName + ".zip"
 	if prefix != "" {
-		// Remove trailing slash and get the folder name
 		folderName := strings.TrimSuffix(prefix, "/")
 		if idx := strings.LastIndex(folderName, "/"); idx >= 0 {
 			folderName = folderName[idx+1:]
@@ -478,12 +461,26 @@ func (h *BucketsHandler) DownloadZip(c echo.Context) error {
 	zipWriter := zip.NewWriter(c.Response().Writer)
 	defer func() { _ = zipWriter.Close() }()
 
-	// Add each file to the ZIP
-	for _, obj := range files {
+	// Stream objects and add to ZIP one at a time to avoid loading all into memory
+	objectsChan := client.ListObjectsChannel(c.Request().Context(), bucketName, minio.ListObjectsOptions{
+		Prefix:    prefix,
+		Recursive: true,
+	})
+
+	fileCount := 0
+	for obj := range objectsChan {
+		if obj.Err != nil {
+			continue
+		}
+
+		// Skip folder markers (objects ending with /)
+		if strings.HasSuffix(obj.Key, "/") {
+			continue
+		}
+
 		// Get the file content
 		reader, _, err := client.GetObjectReader(c.Request().Context(), bucketName, obj.Key, minio.GetObjectOptions{})
 		if err != nil {
-			// Log error but continue with other files
 			continue
 		}
 
@@ -501,7 +498,11 @@ func (h *BucketsHandler) DownloadZip(c echo.Context) error {
 		if err != nil {
 			continue
 		}
+		fileCount++
 	}
+
+	// Note: If fileCount == 0, headers are already sent so we can't return an error.
+	// The ZIP will just be empty, which is acceptable behavior.
 
 	return nil
 }

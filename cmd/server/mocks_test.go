@@ -152,6 +152,16 @@ func (m *MockMinioClient) ListObjects(ctx context.Context, bucketName string, op
 	return args.Get(0).([]minio.ObjectInfo), args.Error(1)
 }
 
+func (m *MockMinioClient) ListObjectsPaginated(ctx context.Context, bucketName string, opts services.ListObjectsOptions) (services.ListObjectsResult, error) {
+	args := m.Called(ctx, bucketName, opts)
+	return args.Get(0).(services.ListObjectsResult), args.Error(1)
+}
+
+func (m *MockMinioClient) ListObjectsChannel(ctx context.Context, bucketName string, opts minio.ListObjectsOptions) <-chan minio.ObjectInfo {
+	args := m.Called(ctx, bucketName, opts)
+	return args.Get(0).(<-chan minio.ObjectInfo)
+}
+
 func (m *MockMinioClient) PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64, opts minio.PutObjectOptions) (minio.UploadInfo, error) {
 	args := m.Called(ctx, bucketName, objectName, reader, objectSize, opts)
 	return args.Get(0).(minio.UploadInfo), args.Error(1)
