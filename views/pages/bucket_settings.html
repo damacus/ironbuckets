@@ -77,6 +77,17 @@
             {{ end }}
         </div>
 
+        <!-- Bucket Policy -->
+        <div
+            hx-get="/buckets/{{ .BucketName }}/policy"
+            hx-trigger="load"
+            hx-swap="outerHTML"
+            class="bg-surface border border-border rounded-xl p-6 lg:col-span-2">
+            <div class="text-center py-4">
+                <div class="animate-spin w-5 h-5 border-2 border-zinc-600 border-t-accent rounded-full mx-auto"></div>
+            </div>
+        </div>
+
         <!-- Lifecycle Rules -->
         <div class="bg-surface border border-border rounded-xl p-6" x-data="{ showForm: false }">
             <div class="flex items-start justify-between mb-4">

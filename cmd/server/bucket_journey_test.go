@@ -117,6 +117,10 @@ func TestObjectBrowserJourney(t *testing.T) {
 		IsTruncated:           false,
 		NextContinuationToken: "",
 	}, nil)
+	mockClient.On("GetBucketPolicy", mock.Anything, "my-bucket").Return("", minio.ErrorResponse{
+		Code:       "NoSuchBucketPolicy",
+		StatusCode: http.StatusNotFound,
+	})
 	mockClient.On("PutObject", mock.Anything, "my-bucket", "testfile.txt", mock.Anything, mock.Anything, mock.Anything).Return(minio.UploadInfo{}, nil)
 
 	encrypted, _ := authService.EncryptCredentials(creds)

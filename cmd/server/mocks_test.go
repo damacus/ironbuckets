@@ -210,6 +210,16 @@ func (m *MockMinioClient) SetBucketLifecycle(ctx context.Context, bucketName str
 	return args.Error(0)
 }
 
+func (m *MockMinioClient) GetBucketPolicy(ctx context.Context, bucketName string) (string, error) {
+	args := m.Called(ctx, bucketName)
+	return args.String(0), args.Error(1)
+}
+
+func (m *MockMinioClient) SetBucketPolicy(ctx context.Context, bucketName, policy string) error {
+	args := m.Called(ctx, bucketName, policy)
+	return args.Error(0)
+}
+
 func (m *MockMinioClient) StatObject(ctx context.Context, bucketName, objectName string, opts minio.StatObjectOptions) (minio.ObjectInfo, error) {
 	args := m.Called(ctx, bucketName, objectName, opts)
 	return args.Get(0).(minio.ObjectInfo), args.Error(1)

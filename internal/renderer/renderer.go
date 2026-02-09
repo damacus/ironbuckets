@@ -68,6 +68,11 @@ func (t *TemplateRenderer) parseTemplates() {
 	t.Templates["versioning_status"] = template.Must(template.ParseFiles("views/partials/versioning_status.html"))
 	t.Templates["bucket_quota"] = template.Must(template.ParseFiles("views/partials/bucket_quota.html"))
 	t.Templates["logs"] = template.Must(template.ParseFiles("views/partials/logs.html"))
+	t.Templates["bucket_policy"] = template.Must(template.ParseFiles(
+		"views/partials/bucket_policy.html",
+		"views/partials/bucket_policy_badge.html",
+	))
+	t.Templates["bucket_policy_badge"] = template.Must(template.ParseFiles("views/partials/bucket_policy_badge.html"))
 }
 
 // selfExecutingTemplates lists templates that execute their own named block instead of "base"
@@ -91,6 +96,8 @@ var selfExecutingTemplates = map[string]bool{
 	"versioning_status":            true,
 	"bucket_quota":                 true,
 	"logs":                         true,
+	"bucket_policy":                true,
+	"bucket_policy_badge":          true,
 }
 
 // Render renders a template document

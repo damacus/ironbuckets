@@ -1,0 +1,79 @@
+{{ define "bucket_policy" }}
+<div id="bucket-policy-panel-{{ .BucketName }}" class="bg-surface border border-border rounded-xl p-6 lg:col-span-2">
+    <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-zinc-800/50 rounded-lg text-zinc-400">
+                <i data-lucide="shield" size="20"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold text-white">Bucket Policy</h3>
+                <p class="text-xs text-zinc-500">Configure access permissions</p>
+            </div>
+        </div>
+        {{ template "bucket_policy_badge" . }}
+    </div>
+
+    <p class="text-sm text-zinc-400 mb-4">
+        Bucket policies define who can access objects in this bucket and what actions they can perform.
+    </p>
+
+    {{ if .Error }}
+    <div class="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg p-3 text-sm mb-4">
+        <i data-lucide="alert-circle" size="16" class="inline mr-1"></i>
+        {{ .Error }}
+    </div>
+    {{ end }}
+
+    <div class="space-y-4" x-data="{ policyType: '{{ .PolicyType }}', showEditor: '{{ .PolicyType }}' === 'custom' }">
+        {{ if .HasPolicy }}
+        <div class="bg-zinc-800/50 rounded-lg p-3">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-zinc-500 text-xs">Current Policy</span>
+            </div>
+            <pre class="text-xs text-zinc-300 overflow-x-auto max-h-48 overflow-y-auto bg-zinc-900 rounded p-2 font-mono">{{ .FormattedPolicy }}</pre>
+        </div>
+        {{ else }}
+        <div class="text-center py-4 text-zinc-500">
+            <i data-lucide="lock" size="24" class="mx-auto mb-2 opacity-50"></i>
+            <p class="text-sm">No policy configured (Private)</p>
+            <p class="text-xs mt-1">Only the bucket owner can access objects</p>
+        </div>
+        {{ end }}
+
+        <form
+            hx-post="/buckets/{{ .BucketName }}/policy"
+            hx-target="#bucket-policy-panel-{{ .BucketName }}"
+            hx-swap="outerHTML"
+            class="space-y-4 pt-4 border-t border-zinc-700">
+            <div>
+                <label class="block text-xs text-zinc-500 mb-2">Access Policy</label>
+                <select
+                    name="policyType"
+                    x-model="policyType"
+                    @change="showEditor = policyType === 'custom'"
+                    class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none">
+                    <option value="private">Private</option>
+                    <option value="public-read">Public Read</option>
+                    <option value="public-read-write">Public Read/Write</option>
+                    <option value="custom">Custom JSON</option>
+                </select>
+            </div>
+
+            <div x-show="showEditor" x-cloak>
+                <label class="block text-xs text-zinc-500 mb-2">Custom Policy JSON</label>
+                <textarea
+                    name="customPolicy"
+                    rows="8"
+                    class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-zinc-200 font-mono focus:border-accent focus:outline-none"
+                    placeholder='{"Version":"2012-10-17","Statement":[...]}'>{{ .FormattedPolicy }}</textarea>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="bg-accent hover:bg-accent/80 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    Save Policy
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{{ end }}

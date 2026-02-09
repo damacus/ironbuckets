@@ -96,6 +96,10 @@ type MinioClient interface {
 	GetBucketLifecycle(ctx context.Context, bucketName string) (*lifecycle.Configuration, error)
 	SetBucketLifecycle(ctx context.Context, bucketName string, config *lifecycle.Configuration) error
 
+	// Bucket Policy
+	GetBucketPolicy(ctx context.Context, bucketName string) (string, error)
+	SetBucketPolicy(ctx context.Context, bucketName, policy string) error
+
 	// Object Metadata & Tags
 	StatObject(ctx context.Context, bucketName, objectName string, opts minio.StatObjectOptions) (minio.ObjectInfo, error)
 	GetObjectTagging(ctx context.Context, bucketName, objectName string, opts minio.GetObjectTaggingOptions) (*tags.Tags, error)
@@ -236,6 +240,14 @@ func (c *WrappedMinioClient) GetBucketLifecycle(ctx context.Context, bucketName 
 
 func (c *WrappedMinioClient) SetBucketLifecycle(ctx context.Context, bucketName string, config *lifecycle.Configuration) error {
 	return c.client.SetBucketLifecycle(ctx, bucketName, config)
+}
+
+func (c *WrappedMinioClient) GetBucketPolicy(ctx context.Context, bucketName string) (string, error) {
+	return c.client.GetBucketPolicy(ctx, bucketName)
+}
+
+func (c *WrappedMinioClient) SetBucketPolicy(ctx context.Context, bucketName, policy string) error {
+	return c.client.SetBucketPolicy(ctx, bucketName, policy)
 }
 
 func (c *WrappedMinioClient) StatObject(ctx context.Context, bucketName, objectName string, opts minio.StatObjectOptions) (minio.ObjectInfo, error) {

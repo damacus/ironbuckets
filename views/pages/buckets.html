@@ -56,6 +56,13 @@
             </div>
             <a href="/buckets/{{ .Name }}" class="block">
                 <div class="font-bold text-lg text-white mb-1">{{ .Name }}</div>
+                <div
+                    class="mb-2"
+                    hx-get="/buckets/{{ .Name }}/policy/badge"
+                    hx-trigger="load"
+                    hx-swap="innerHTML">
+                    <span class="text-xs bg-zinc-500/10 text-zinc-500 px-2 py-1 rounded">Loading policy...</span>
+                </div>
                 <div class="text-sm text-zinc-500">
                     Created {{ .CreationDate.Format "Jan 2, 2006" }}
                 </div>

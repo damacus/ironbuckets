@@ -237,6 +237,8 @@ func (h *BucketsHandler) BrowseBucket(c echo.Context) error {
 		}
 	}
 
+	policyState := loadBucketPolicy(c.Request().Context(), client, bucketName)
+
 	return c.Render(http.StatusOK, "browser", map[string]interface{}{
 		"ActiveNav":             "buckets",
 		"BucketName":            bucketName,
@@ -246,6 +248,8 @@ func (h *BucketsHandler) BrowseBucket(c echo.Context) error {
 		"Breadcrumbs":           breadcrumbs,
 		"HasMore":               result.IsTruncated,
 		"NextContinuationToken": result.NextContinuationToken,
+		"PolicyType":            policyState.PolicyType,
+		"PolicyError":           policyState.Error,
 	})
 }
 
@@ -579,11 +583,109 @@ func (h *BucketsHandler) BucketSettings(c echo.Context) error {
 		}
 	}
 
+	policyState := loadBucketPolicy(c.Request().Context(), client, bucketName)
+
 	return c.Render(http.StatusOK, "bucket_settings", map[string]interface{}{
 		"ActiveNav":         "buckets",
 		"BucketName":        bucketName,
 		"VersioningStatus":  versioningStatus,
 		"VersioningEnabled": versioningConfig.Enabled(),
+		"PolicyType":        policyState.PolicyType,
+		"PolicyError":       policyState.Error,
+	})
+}
+
+// GetBucketPolicy returns the policy card for a bucket.
+func (h *BucketsHandler) GetBucketPolicy(c echo.Context) error {
+	bucketName := c.Param("bucketName")
+
+	creds, err := GetCredentials(c)
+	if err != nil {
+		return c.Render(http.StatusOK, "bucket_policy", policyViewData(bucketName, bucketPolicyState{
+			PolicyType: policyTypePrivate,
+			Error:      "Unauthorized",
+		}))
+	}
+
+	client, err := h.minioFactory.NewClient(*creds)
+	if err != nil {
+		return c.Render(http.StatusOK, "bucket_policy", policyViewData(bucketName, bucketPolicyState{
+			PolicyType: policyTypeUnknown,
+			Error:      "Failed to connect to MinIO",
+		}))
+	}
+
+	return c.Render(http.StatusOK, "bucket_policy", policyViewData(bucketName, loadBucketPolicy(c.Request().Context(), client, bucketName)))
+}
+
+// SetBucketPolicy applies a policy type (or custom JSON) and re-renders policy card.
+func (h *BucketsHandler) SetBucketPolicy(c echo.Context) error {
+	bucketName := c.Param("bucketName")
+	policyType := c.FormValue("policyType")
+	customPolicy := c.FormValue("customPolicy")
+
+	policyText, err := buildPolicyForType(policyType, bucketName, customPolicy)
+	if err != nil {
+		return c.Render(http.StatusBadRequest, "bucket_policy", policyViewData(bucketName, bucketPolicyState{
+			Policy:     customPolicy,
+			PolicyType: policyType,
+			Error:      err.Error(),
+		}))
+	}
+
+	creds, err := GetCredentials(c)
+	if err != nil {
+		return c.Render(http.StatusUnauthorized, "bucket_policy", policyViewData(bucketName, bucketPolicyState{
+			Policy:     customPolicy,
+			PolicyType: policyType,
+			Error:      "Unauthorized",
+		}))
+	}
+
+	client, err := h.minioFactory.NewClient(*creds)
+	if err != nil {
+		return c.Render(http.StatusInternalServerError, "bucket_policy", policyViewData(bucketName, bucketPolicyState{
+			Policy:     customPolicy,
+			PolicyType: policyType,
+			Error:      "Failed to connect to MinIO",
+		}))
+	}
+
+	if err := client.SetBucketPolicy(c.Request().Context(), bucketName, policyText); err != nil {
+		return c.Render(http.StatusInternalServerError, "bucket_policy", policyViewData(bucketName, bucketPolicyState{
+			Policy:     customPolicy,
+			PolicyType: policyType,
+			Error:      fmt.Sprintf("Failed to set bucket policy: %s", err.Error()),
+		}))
+	}
+
+	return c.Render(http.StatusOK, "bucket_policy", policyViewData(bucketName, loadBucketPolicy(c.Request().Context(), client, bucketName)))
+}
+
+// GetBucketPolicyBadge returns an isolated badge to avoid N+1 blocking on list render.
+func (h *BucketsHandler) GetBucketPolicyBadge(c echo.Context) error {
+	bucketName := c.Param("bucketName")
+
+	creds, err := GetCredentials(c)
+	if err != nil {
+		return c.Render(http.StatusOK, "bucket_policy_badge", map[string]interface{}{
+			"PolicyType": policyTypeUnknown,
+			"Error":      "Unauthorized",
+		})
+	}
+
+	client, err := h.minioFactory.NewClient(*creds)
+	if err != nil {
+		return c.Render(http.StatusOK, "bucket_policy_badge", map[string]interface{}{
+			"PolicyType": policyTypeUnknown,
+			"Error":      "Failed to connect to MinIO",
+		})
+	}
+
+	state := loadBucketPolicy(c.Request().Context(), client, bucketName)
+	return c.Render(http.StatusOK, "bucket_policy_badge", map[string]interface{}{
+		"PolicyType": state.PolicyType,
+		"Error":      state.Error,
 	})
 }
 

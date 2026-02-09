@@ -84,6 +84,17 @@
                         <i data-lucide="arrow-left" size="20"></i>
                     </a>
                     <h1 class="text-lg font-semibold text-white">{{ .BucketName }}</h1>
+                    {{ if eq .PolicyType "public-read" }}
+                    <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded">Public Read</span>
+                    {{ else if eq .PolicyType "public-read-write" }}
+                    <span class="text-xs bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded">Public Read/Write</span>
+                    {{ else if eq .PolicyType "custom" }}
+                    <span class="text-xs bg-accent/10 text-accent px-2 py-1 rounded">Custom</span>
+                    {{ else if eq .PolicyType "unknown" }}
+                    <span class="text-xs bg-red-500/10 text-red-400 px-2 py-1 rounded">Unknown</span>
+                    {{ else }}
+                    <span class="text-xs bg-zinc-500/10 text-zinc-400 px-2 py-1 rounded">Private</span>
+                    {{ end }}
                 </div>
                 <div class="flex items-center gap-3">
                 <!-- Search -->
@@ -140,6 +151,11 @@
                 <a href="/buckets/{{ $.BucketName }}?prefix={{ .Path }}" class="text-zinc-400 hover:text-white shrink-0">{{ .Name }}</a>
                 {{ end }}
             </nav>
+            {{ if .PolicyError }}
+            <div class="px-8 py-2 text-xs text-red-400 border-t border-red-500/20 bg-red-500/5">
+                {{ .PolicyError }}
+            </div>
+            {{ end }}
         </header>
 
         <!-- Bulk Actions Bar -->
