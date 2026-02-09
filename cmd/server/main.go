@@ -21,6 +21,13 @@ func main() {
 		log.Printf("MINIO_ENDPOINT not set, using default: %s", minioEndpoint)
 	}
 
+	e := newServer(minioEndpoint)
+
+	// Start Server
+	e.Logger.Fatal(e.Start(":8080"))
+}
+
+func newServer(minioEndpoint string) *echo.Echo {
 	e := echo.New()
 
 	// Services
@@ -44,6 +51,8 @@ func main() {
 		},
 	}))
 	e.Use(middleware.Recover())
+	e.Use(customMiddleware.SecurityHeaders())
+	e.Use(customMiddleware.CSRF())
 	// Apply auth middleware globally - it will skip public routes internally
 	e.Use(customMiddleware.AuthMiddleware(authService))
 
@@ -136,6 +145,5 @@ func main() {
 	e.POST("/settings/restart", settingsHandler.RestartService)
 	e.GET("/settings/logs", settingsHandler.GetLogs)
 
-	// Start Server
-	e.Logger.Fatal(e.Start(":8080"))
+	return e
 }
