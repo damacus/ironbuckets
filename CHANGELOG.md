@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/damacus/ironbuckets/compare/v1.2.1...v1.3.0) (2026-02-10)
+
+
+### Features
+
+* add HTMX boosting for SPA-like navigation ([#9](https://github.com/damacus/ironbuckets/issues/9)) ([7ab376d](https://github.com/damacus/ironbuckets/commit/7ab376db29af0496a6d548d1060219cba3c80039))
+* Security workflows ([#14](https://github.com/damacus/ironbuckets/issues/14)) ([2ee555a](https://github.com/damacus/ironbuckets/commit/2ee555a2deb84bdd40707ea18613b0c83c0601aa))
+
 ## [1.2.1](https://github.com/damacus/ironbuckets/compare/v1.2.0...v1.2.1) (2026-01-14)
 
 
