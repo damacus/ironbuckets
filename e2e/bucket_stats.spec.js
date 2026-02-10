@@ -111,12 +111,21 @@ test.describe('Bucket Stats', () => {
 		// Use the specific ID from the HTML
 		const fileInput = page.locator('#upload-input');
 
-		// Set files on the hidden input
-		await fileInput.setInputFiles(testFilePath);
-		console.log('File set on input');
+		// Set files on the hidden input and wait for the upload response
+		const [response] = await Promise.all([
+			page.waitForResponse(resp => resp.url().includes('/upload') && resp.status() === 200, { timeout: 15000 }),
+			fileInput.setInputFiles(testFilePath),
+		]);
+		console.log('File uploaded, response status:', response.status());
 
-		// The onchange handler triggers HTMX submit, which reloads the page.
-		// We wait for the file name to appear in the list.
+		// Wait for the page to reload (triggered by hx-on::after-request)
+		await page.waitForLoadState('networkidle');
+
+		// If the file is still not visible, the page reload may not have happened yet
+		if (!(await page.getByText(testFileName).isVisible())) {
+			await page.reload();
+			await page.waitForLoadState('networkidle');
+		}
 		await expect(page.getByText(testFileName)).toBeVisible({ timeout: 10000 });
 		console.log('File uploaded and visible');
 
