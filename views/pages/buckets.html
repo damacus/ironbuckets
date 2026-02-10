@@ -21,17 +21,16 @@
                     <i data-lucide="container"></i>
                 </div>
                 <!-- Actions Dropdown -->
-                <div class="relative" x-data="{ open: false }">
+                <div class="relative">
                     <button
-                        @click="open = !open"
+                        type="button"
+                        onclick="const menu = this.nextElementSibling; menu.classList.toggle('hidden');"
                         class="text-zinc-500 hover:text-white">
                         <i data-lucide="more-vertical" size="16"></i>
                     </button>
                     <div
-                        x-show="open"
-                        @click.away="open = false"
-                        x-transition
-                        class="absolute right-0 mt-2 w-48 bg-zinc-900 border border-zinc-700 rounded-lg shadow-lg z-50">
+                        class="hidden absolute right-0 mt-2 w-48 bg-zinc-900 border border-zinc-700 rounded-lg shadow-lg z-50"
+                        onclick="event.stopPropagation()">
                         <a
                             href="/buckets/{{ .Name }}"
                             class="block px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-t-lg">
@@ -73,14 +72,7 @@
             <i data-lucide="container" size="32" class="text-zinc-600"></i>
         </div>
         <h3 class="text-lg font-semibold text-white mb-2">No buckets yet</h3>
-        <p class="text-zinc-500 mb-4">Create your first bucket to start storing objects</p>
-        <button
-            hx-get="/buckets/create"
-            hx-target="body"
-            hx-swap="beforeend"
-            class="bg-white text-black px-4 py-2 rounded-md text-sm font-semibold hover:bg-zinc-200 inline-flex items-center gap-2">
-            <i data-lucide="plus" size="16"></i> Create Bucket
-        </button>
+        <p class="text-zinc-500 mb-4">Create your first bucket using the button above to start storing objects</p>
     </div>
     {{ end }}
 </div>

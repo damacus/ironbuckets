@@ -8,6 +8,7 @@ const { test, expect } = require('@playwright/test');
  */
 
 test.describe('User Management Journey', () => {
+  test.describe.configure({ mode: 'serial' });
   const ADMIN_USER = process.env.ADMIN_USER || 'minioadmin';
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'minioadmin';
   const APP_URL = process.env.APP_URL || 'http://localhost:8080';
@@ -17,14 +18,8 @@ test.describe('User Management Journey', () => {
    * Playwright's click() doesn't always trigger HTMX events reliably
    */
   async function openAddUserModal(page) {
-    // Wait for HTMX to be loaded
-    await page.waitForFunction(() => typeof window.htmx !== 'undefined');
-
-    // Trigger HTMX on the Add User button
-    await page.evaluate(() => {
-      const btn = document.querySelector('button[hx-get="/users/create"]');
-      if (btn) window.htmx.trigger(btn, 'click');
-    });
+    await expect(page.locator('button[hx-get="/users/create"]')).toBeVisible({ timeout: 10000 });
+    await page.getByRole('button', { name: /Add User/i }).click();
 
     // Wait for modal to appear
     await page.waitForSelector('#user-modal', { state: 'visible', timeout: 5000 });
@@ -57,8 +52,7 @@ test.describe('User Management Journey', () => {
     const newPassword = 'SecurePassword123!';
 
     // Step 1: Navigate to Users page
-    await page.goto(`${APP_URL}/users`);
-    await expect(page.locator('h2')).toContainText('Identity Management');
+    await ensurePageContent(page, `${APP_URL}/users`, 'button[hx-get="/users/create"]');
 
     // Step 2: Open "Add User" modal
     await openAddUserModal(page);
@@ -99,7 +93,7 @@ test.describe('User Management Journey', () => {
 
   test('should handle user creation validation errors', async ({ page }) => {
     // Navigate to Users page
-    await page.goto(`${APP_URL}/users`);
+    await ensurePageContent(page, `${APP_URL}/users`, 'button[hx-get="/users/create"]');
 
     // Open modal
     await openAddUserModal(page);
@@ -117,7 +111,7 @@ test.describe('User Management Journey', () => {
 
   test('should close modal on cancel', async ({ page }) => {
     // Navigate to Users page
-    await page.goto(`${APP_URL}/users`);
+    await ensurePageContent(page, `${APP_URL}/users`, 'button[hx-get="/users/create"]');
 
     // Open modal
     await openAddUserModal(page);
@@ -131,7 +125,7 @@ test.describe('User Management Journey', () => {
 
   test('should close modal when clicking backdrop', async ({ page }) => {
     // Navigate to Users page
-    await page.goto(`${APP_URL}/users`);
+    await ensurePageContent(page, `${APP_URL}/users`, 'button[hx-get="/users/create"]');
 
     // Open modal
     await openAddUserModal(page);
@@ -150,3 +144,13 @@ test.describe('User Management Journey', () => {
     await expect(page.locator('#user-modal')).not.toBeVisible();
   });
 });
+  async function ensurePageContent(page, url, readySelector) {
+    await page.goto(url);
+    await page.waitForLoadState('networkidle');
+    let text = (await page.locator('#main-content').innerText().catch(() => '')).trim();
+    if (!text) {
+      await page.reload();
+      await page.waitForLoadState('networkidle');
+    }
+    await expect(page.locator(readySelector)).toBeVisible({ timeout: 10000 });
+  }

@@ -8,6 +8,7 @@ const ADMIN_USER = process.env.ADMIN_USER || 'minioadmin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'minioadmin';
 
 test.describe('Bucket Stats', () => {
+	test.describe.configure({ mode: 'serial' });
 	let testBucket;
 	const testFileName = 'test-upload.txt';
 	const testFileContent = 'Hello IronBuckets! This is a test file for verifying size updates.';
@@ -15,11 +16,8 @@ test.describe('Bucket Stats', () => {
 
 	// Helper to open Create Bucket Modal
 	async function openCreateBucketModal(page) {
-		await page.waitForFunction(() => typeof window.htmx !== 'undefined');
-		await page.evaluate(() => {
-			const btn = document.querySelector('button[hx-get="/buckets/create"]');
-			if (btn) window.htmx.trigger(btn, 'click');
-		});
+		await expect(page.locator('button[hx-get="/buckets/create"]')).toBeVisible({ timeout: 10000 });
+		await page.getByRole('button', { name: /Create Bucket/i }).click();
 		await page.waitForSelector('#bucket-modal', { state: 'visible', timeout: 5000 });
 	}
 
@@ -86,7 +84,7 @@ test.describe('Bucket Stats', () => {
 		test.setTimeout(120000);
 		console.log('Starting test...');
 		// 1. Create Bucket
-		await page.goto(`${APP_URL}/buckets`);
+		await ensurePageContent(page, `${APP_URL}/buckets`, 'button[hx-get="/buckets/create"]');
 		console.log('Navigated to buckets list');
 
 		await openCreateBucketModal(page);
@@ -155,3 +153,13 @@ test.describe('Bucket Stats', () => {
 		console.log('Size updated (not 0 B)');
 	});
 });
+	async function ensurePageContent(page, url, readySelector) {
+		await page.goto(url);
+		await page.waitForLoadState('networkidle');
+		let text = (await page.locator('#main-content').innerText().catch(() => '')).trim();
+		if (!text) {
+			await page.reload();
+			await page.waitForLoadState('networkidle');
+		}
+		await expect(page.locator(readySelector)).toBeVisible({ timeout: 10000 });
+	}

@@ -25,7 +25,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.445.0"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/@alpinejs/csp@3.14.8/dist/cdn.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .drop-active { background-color: rgba(37, 99, 235, 0.1); border-color: #2563eb !important; }
@@ -389,7 +389,9 @@
     </div>
 
     <!-- Upload Progress Modal -->
-    <div x-show="uploadProgress.show" x-cloak
+    <div id="upload-progress-modal" x-cloak
+        style="display: none;"
+        :style="uploadProgress.show ? 'display: flex' : 'display: none'"
         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
         <div class="bg-surface border border-border rounded-xl p-6 w-full max-w-md">
             <h3 class="font-semibold text-white mb-4">Uploading Files</h3>
