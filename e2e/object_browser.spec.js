@@ -6,6 +6,7 @@ const ADMIN_USER = process.env.ADMIN_USER || 'minioadmin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'minioadmin';
 
 test.describe('Object Browser', () => {
+  test.describe.configure({ mode: 'serial' });
   // Each test gets its own unique bucket name
   let testBucket;
 
@@ -13,11 +14,8 @@ test.describe('Object Browser', () => {
    * Helper to open the Create Bucket modal via HTMX
    */
   async function openCreateBucketModal(page) {
-    await page.waitForFunction(() => typeof window.htmx !== 'undefined');
-    await page.evaluate(() => {
-      const btn = document.querySelector('button[hx-get="/buckets/create"]');
-      if (btn) window.htmx.trigger(btn, 'click');
-    });
+    await expect(page.locator('button[hx-get="/buckets/create"]')).toBeVisible({ timeout: 10000 });
+    await page.getByRole('button', { name: /Create Bucket/i }).click();
     await page.waitForSelector('#bucket-modal', { state: 'visible', timeout: 5000 });
   }
 
@@ -40,6 +38,7 @@ test.describe('Object Browser', () => {
     await page.click('button[type="submit"]');
 
     await page.waitForURL(`${APP_URL}/`, { timeout: 10000 });
+    await page.waitForLoadState('networkidle');
   });
 
   test.afterEach(async ({ page }) => {
@@ -76,7 +75,7 @@ test.describe('Object Browser', () => {
 
   test('should create a bucket and navigate to object browser', async ({ page }) => {
     // Navigate to buckets
-    await page.goto(`${APP_URL}/buckets`);
+    await ensurePageContent(page, `${APP_URL}/buckets`, 'button[hx-get="/buckets/create"]');
 
     // Create a new bucket via HTMX modal
     await openCreateBucketModal(page);
@@ -101,7 +100,7 @@ test.describe('Object Browser', () => {
 
   test('should create a folder and navigate into it', async ({ page }) => {
     // Create bucket first
-    await page.goto(`${APP_URL}/buckets`);
+    await ensurePageContent(page, `${APP_URL}/buckets`, 'button[hx-get="/buckets/create"]');
     await openCreateBucketModal(page);
     await page.fill('#bucket-modal input[name="bucketName"]', testBucket);
     await page.click('#bucket-modal button[type="submit"]');
@@ -133,7 +132,7 @@ test.describe('Object Browser', () => {
 
   test('should navigate using breadcrumbs', async ({ page }) => {
     // Create bucket first
-    await page.goto(`${APP_URL}/buckets`);
+    await ensurePageContent(page, `${APP_URL}/buckets`, 'button[hx-get="/buckets/create"]');
     await openCreateBucketModal(page);
     await page.fill('#bucket-modal input[name="bucketName"]', testBucket);
     await page.click('#bucket-modal button[type="submit"]');
@@ -177,7 +176,7 @@ test.describe('Object Browser', () => {
 
   test('should have working search input', async ({ page }) => {
     // Create bucket first
-    await page.goto(`${APP_URL}/buckets`);
+    await ensurePageContent(page, `${APP_URL}/buckets`, 'button[hx-get="/buckets/create"]');
     await openCreateBucketModal(page);
     await page.fill('#bucket-modal input[name="bucketName"]', testBucket);
     await page.click('#bucket-modal button[type="submit"]');
@@ -207,3 +206,13 @@ test.describe('Object Browser', () => {
   });
 
 });
+  async function ensurePageContent(page, url, readySelector) {
+    await page.goto(url);
+    await page.waitForLoadState('networkidle');
+    let text = (await page.locator('#main-content').innerText().catch(() => '')).trim();
+    if (!text) {
+      await page.reload();
+      await page.waitForLoadState('networkidle');
+    }
+    await expect(page.locator(readySelector)).toBeVisible({ timeout: 10000 });
+  }

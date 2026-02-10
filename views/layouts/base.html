@@ -28,11 +28,11 @@
 
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@0.445.0"></script>
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <!-- Alpine.js -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/@alpinejs/csp@3.14.8/dist/cdn.min.js"></script>
 
     <style>
         body {
@@ -56,7 +56,7 @@
 </head>
 
 <body class="bg-background text-zinc-100 h-screen w-screen flex overflow-hidden" x-data="{ collapsed: false }"
-    hx-boost="true" hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML">
+    hx-boost="true">
 
     <!-- SIDEBAR -->
     <div class="border-r border-border bg-surface flex flex-col transition-all duration-300 ease-in-out w-64"
@@ -165,6 +165,18 @@
     {{ template "confirm_dialog" }}
 
     <script>
+        function getCookieValue(name) {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? decodeURIComponent(match[2]) : '';
+        }
+
+        document.body.addEventListener('htmx:configRequest', function (evt) {
+            const csrfToken = getCookieValue('csrf');
+            if (csrfToken) {
+                evt.detail.headers['X-CSRF-Token'] = csrfToken;
+            }
+        });
+
         // Init Icons
         lucide.createIcons();
 

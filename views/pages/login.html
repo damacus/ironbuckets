@@ -23,7 +23,7 @@
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@0.445.0"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
@@ -85,6 +85,18 @@
     </div>
 
     <script>
+        function getCookieValue(name) {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? decodeURIComponent(match[2]) : '';
+        }
+
+        document.body.addEventListener('htmx:configRequest', function (evt) {
+            const csrfToken = getCookieValue('csrf');
+            if (csrfToken) {
+                evt.detail.headers['X-CSRF-Token'] = csrfToken;
+            }
+        });
+
         lucide.createIcons();
     </script>
 </body>
