@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --version)",
+      "Bash(uvx:*)",
+      "Bash(ln:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh run list:*)",
+      "Bash(go test:*)",
+      "Bash(git push:*)",
+      "Bash(ls:*)",
+      "Bash(task --list:*)",
+      "Bash(task test:e2e:*)",
+      "Bash(npx playwright test:*)"
+    ]
+  }
+}
