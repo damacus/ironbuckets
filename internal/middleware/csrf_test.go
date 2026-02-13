@@ -27,6 +27,21 @@ func TestCSRFMiddlewareRejectsPostWithoutToken(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
 
+func TestCSRFMiddlewareSkipsNonHTMXPostWithoutToken(t *testing.T) {
+	e := echo.New()
+	e.Use(CSRF())
+	e.POST("/submit", func(c echo.Context) error {
+		return c.String(http.StatusOK, "ok")
+	})
+
+	req := httptest.NewRequest(http.MethodPost, "/submit", strings.NewReader("x=1"))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+}
+
 func TestCSRFMiddlewareAllowsPostWithTokenHeaderAndCookie(t *testing.T) {
 	e := echo.New()
 	e.Use(CSRF())
