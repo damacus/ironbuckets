@@ -275,7 +275,12 @@ func (h *BucketsHandler) UploadObject(c echo.Context) error {
 	}
 
 	// Put Object with prefix support
-	objectKey := prefix + file.Filename
+	filename := filepath.Base(file.Filename)
+	if filename == "" || filename == "." || strings.Contains(file.Filename, "..") {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid file name")
+	}
+
+	objectKey := prefix + filename
 	_, err = client.PutObject(c.Request().Context(), bucketName, objectKey, src, file.Size, minio.PutObjectOptions{
 		ContentType: file.Header.Get("Content-Type"),
 	})

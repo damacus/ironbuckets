@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/damacus/iron-buckets/internal/services"
 	"github.com/damacus/iron-buckets/internal/utils"
@@ -28,9 +29,17 @@ func AuthMiddleware(authService *services.AuthService) echo.MiddlewareFunc {
 			// Decrypt
 			creds, err := authService.DecryptCredentials(cookie.Value)
 			if err != nil {
-				// Invalid cookie - Clear it to prevent loop
-				cookie.MaxAge = -1
-				c.SetCookie(cookie)
+				// Invalid cookie - clear it with the same attributes as auth handlers.
+				c.SetCookie(&http.Cookie{
+					Name:     utils.CookieName,
+					Value:    "",
+					Expires:  time.Now().Add(-1 * time.Hour),
+					MaxAge:   -1,
+					Path:     "/",
+					HttpOnly: true,
+					SameSite: http.SameSiteStrictMode,
+					Secure:   isSecureRequest(c),
+				})
 				return c.Redirect(http.StatusSeeOther, "/login")
 			}
 
