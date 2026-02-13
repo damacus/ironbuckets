@@ -79,7 +79,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	cookie.Path = "/"
 	cookie.HttpOnly = true
 	cookie.SameSite = http.SameSiteStrictMode
-	cookie.Secure = requestIsSecure(c)
+	cookie.Secure = utils.IsSecureRequest(c.Request())
 	c.SetCookie(cookie)
 
 	// 4. Redirect (HTMX handles 200 OK with HX-Redirect)
@@ -96,18 +96,9 @@ func (h *AuthHandler) Logout(c echo.Context) error {
 	cookie.Path = "/"
 	cookie.HttpOnly = true
 	cookie.SameSite = http.SameSiteStrictMode
-	cookie.Secure = requestIsSecure(c)
+	cookie.Secure = utils.IsSecureRequest(c.Request())
 	c.SetCookie(cookie)
 	return c.Redirect(http.StatusSeeOther, "/login")
-}
-
-func requestIsSecure(c echo.Context) bool {
-	req := c.Request()
-	if req.TLS != nil {
-		return true
-	}
-
-	return req.Header.Get("X-Forwarded-Proto") == "https"
 }
 
 // LoginOIDC initiates the OIDC flow
