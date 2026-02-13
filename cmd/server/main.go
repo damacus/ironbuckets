@@ -15,17 +15,24 @@ import (
 )
 
 func main() {
-	// Load MinIO endpoint from environment
-	minioEndpoint := os.Getenv("MINIO_ENDPOINT")
-	if minioEndpoint == "" {
-		minioEndpoint = "play.min.io:9000" // Default for development
-		log.Printf("MINIO_ENDPOINT not set, using default: %s", minioEndpoint)
+	minioEndpoint, usedDefault := resolveMinioEndpoint()
+	if usedDefault {
+		log.Printf("MINIO_ENDPOINT not set, using local default: %s", minioEndpoint)
 	}
 
 	e := newServer(minioEndpoint)
 
 	// Start Server
 	e.Logger.Fatal(e.Start(":8080"))
+}
+
+func resolveMinioEndpoint() (string, bool) {
+	minioEndpoint := os.Getenv("MINIO_ENDPOINT")
+	if minioEndpoint == "" {
+		return "localhost:9000", true
+	}
+
+	return minioEndpoint, false
 }
 
 func newServer(minioEndpoint string) *echo.Echo {
