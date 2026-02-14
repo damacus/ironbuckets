@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/damacus/iron-buckets/internal/handlers"
 	customMiddleware "github.com/damacus/iron-buckets/internal/middleware"
@@ -51,6 +52,7 @@ func newServer(minioEndpoint string) *echo.Echo {
 		},
 	}))
 	e.Use(middleware.Recover())
+	e.Use(customMiddleware.RequestTimeout(30 * time.Second))
 	e.Use(customMiddleware.SecurityHeaders())
 	e.Use(customMiddleware.CSRF())
 	// Apply auth middleware globally - it will skip public routes internally
