@@ -325,6 +325,9 @@ func (h *BucketsHandler) DeleteObject(c echo.Context) error {
 
 	bucketName := c.Param("bucketName")
 	objectName := c.QueryParam("key")
+	if strings.TrimSpace(objectName) == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Object key is required")
+	}
 
 	client, err := h.minioFactory.NewClient(*creds)
 	if err != nil {
@@ -347,6 +350,9 @@ func (h *BucketsHandler) DownloadObject(c echo.Context) error {
 
 	bucketName := c.Param("bucketName")
 	objectName := c.QueryParam("key")
+	if strings.TrimSpace(objectName) == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Object key is required")
+	}
 
 	client, err := h.minioFactory.NewClient(*creds)
 	if err != nil {
