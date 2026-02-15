@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"crypto/tls"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/damacus/iron-buckets/internal/services"
 	"github.com/damacus/iron-buckets/internal/utils"
@@ -139,6 +141,7 @@ func TestAuthMiddleware_ClearsInvalidCookie(t *testing.T) {
 	authService := services.NewAuthService()
 
 	req := httptest.NewRequest(http.MethodGet, "/dashboard", nil)
+	req.TLS = &tls.ConnectionState{}
 	req.AddCookie(&http.Cookie{
 		Name:  utils.CookieName,
 		Value: "invalid-encrypted-value",
@@ -157,7 +160,15 @@ func TestAuthMiddleware_ClearsInvalidCookie(t *testing.T) {
 	cookies := rec.Result().Cookies()
 	var foundClearCookie bool
 	for _, cookie := range cookies {
-		if cookie.Name == utils.CookieName && cookie.MaxAge == -1 {
+		if cookie.Name == utils.CookieName {
+			assert.Equal(t, "", cookie.Value)
+			assert.Equal(t, -1, cookie.MaxAge)
+			assert.Equal(t, "/", cookie.Path)
+			assert.True(t, cookie.HttpOnly)
+			assert.Equal(t, http.SameSiteStrictMode, cookie.SameSite)
+			assert.True(t, cookie.Secure)
+			assert.False(t, cookie.Expires.IsZero())
+			assert.True(t, cookie.Expires.Before(time.Now().Add(-30*time.Minute)))
 			foundClearCookie = true
 			break
 		}
