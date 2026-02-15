@@ -4,8 +4,10 @@ import (
 	"archive/zip"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -25,6 +27,8 @@ import (
 type BucketsHandler struct {
 	minioFactory services.MinioClientFactory
 }
+
+var bucketNamePattern = regexp.MustCompile(`^[a-z0-9][a-z0-9.-]*[a-z0-9]$`)
 
 func NewBucketsHandler(minioFactory services.MinioClientFactory) *BucketsHandler {
 	return &BucketsHandler{minioFactory: minioFactory}
@@ -103,9 +107,9 @@ func (h *BucketsHandler) CreateBucket(c echo.Context) error {
 			"Error": "Bucket name is required",
 		})
 	}
-	if len(bucketName) < 3 || len(bucketName) > 63 {
+	if !isValidBucketName(bucketName) {
 		return c.Render(http.StatusBadRequest, "bucket_create_modal", map[string]interface{}{
-			"Error": "Bucket name must be between 3 and 63 characters",
+			"Error": "Invalid bucket name",
 		})
 	}
 
@@ -129,6 +133,22 @@ func (h *BucketsHandler) CreateBucket(c echo.Context) error {
 
 	// Success - close modal and refresh page
 	return HTMXRedirect(c, "/buckets")
+}
+
+func isValidBucketName(name string) bool {
+	if len(name) < 3 || len(name) > 63 {
+		return false
+	}
+
+	if !bucketNamePattern.MatchString(name) {
+		return false
+	}
+
+	if strings.Contains(name, "..") || strings.Contains(name, ".-") || strings.Contains(name, "-.") {
+		return false
+	}
+
+	return net.ParseIP(name) == nil
 }
 
 // DeleteBucket handles removing a bucket
