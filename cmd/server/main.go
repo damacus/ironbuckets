@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"strings"
 
 	"github.com/damacus/iron-buckets/internal/handlers"
 	customMiddleware "github.com/damacus/iron-buckets/internal/middleware"
@@ -41,7 +42,8 @@ func newServer(minioEndpoint string) *echo.Echo {
 	// Services
 	authService := services.NewAuthService()
 	minioFactory := &services.RealMinioFactory{}
-	authHandler := handlers.NewAuthHandler(authService, minioFactory, minioEndpoint)
+	oidcEnabled := oidcEnabledFromEnv()
+	authHandler := handlers.NewAuthHandler(authService, minioFactory, minioEndpoint, oidcEnabled)
 	usersHandler := handlers.NewUsersHandler(minioFactory)
 	groupsHandler := handlers.NewGroupsHandler(minioFactory)
 	bucketsHandler := handlers.NewBucketsHandler(minioFactory)
@@ -69,16 +71,40 @@ func newServer(minioEndpoint string) *echo.Echo {
 	e.Renderer = renderer.New()
 
 	// Public Routes (auth middleware will skip these)
+	registerPublicRoutes(e, authHandler, oidcEnabled)
+
+	// Protected Routes
+	registerProtectedRoutes(e, drivesHandler, dashboardHandler, usersHandler, groupsHandler, bucketsHandler, settingsHandler)
+
+	return e
+}
+
+func oidcEnabledFromEnv() bool {
+	return strings.EqualFold(os.Getenv("OIDC_ENABLED"), "true")
+}
+
+func registerPublicRoutes(e *echo.Echo, authHandler *handlers.AuthHandler, oidcEnabled bool) {
 	e.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "OK")
 	})
 	e.GET("/login", authHandler.LoginPage)
 	e.POST("/login", authHandler.Login)
-	e.GET("/login/oauth", authHandler.LoginOIDC)
-	e.GET("/oauth/callback", authHandler.CallbackOIDC)
+	if oidcEnabled {
+		e.GET("/login/oauth", authHandler.LoginOIDC)
+		e.GET("/oauth/callback", authHandler.CallbackOIDC)
+	}
 	e.GET("/logout", authHandler.Logout)
+}
 
-	// Protected Routes
+func registerProtectedRoutes(
+	e *echo.Echo,
+	drivesHandler *handlers.DrivesHandler,
+	dashboardHandler *handlers.DashboardHandler,
+	usersHandler *handlers.UsersHandler,
+	groupsHandler *handlers.GroupsHandler,
+	bucketsHandler *handlers.BucketsHandler,
+	settingsHandler *handlers.SettingsHandler,
+) {
 	e.GET("/", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "dashboard", map[string]interface{}{
 			"ActiveNav": "dashboard",
@@ -153,6 +179,4 @@ func newServer(minioEndpoint string) *echo.Echo {
 	e.GET("/settings", settingsHandler.ShowSettings)
 	e.POST("/settings/restart", settingsHandler.RestartService)
 	e.GET("/settings/logs", settingsHandler.GetLogs)
-
-	return e
 }

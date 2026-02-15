@@ -13,13 +13,15 @@ type AuthHandler struct {
 	authService   *services.AuthService
 	minioFactory  services.MinioClientFactory
 	minioEndpoint string
+	oidcEnabled   bool
 }
 
-func NewAuthHandler(authService *services.AuthService, minioFactory services.MinioClientFactory, minioEndpoint string) *AuthHandler {
+func NewAuthHandler(authService *services.AuthService, minioFactory services.MinioClientFactory, minioEndpoint string, oidcEnabled bool) *AuthHandler {
 	return &AuthHandler{
 		authService:   authService,
 		minioFactory:  minioFactory,
 		minioEndpoint: minioEndpoint,
+		oidcEnabled:   oidcEnabled,
 	}
 }
 
@@ -103,6 +105,10 @@ func (h *AuthHandler) Logout(c echo.Context) error {
 
 // LoginOIDC initiates the OIDC flow
 func (h *AuthHandler) LoginOIDC(c echo.Context) error {
+	if !h.oidcEnabled {
+		return echo.NewHTTPError(http.StatusServiceUnavailable, "OIDC login is not enabled")
+	}
+
 	// TODO: Generate state, store in cookie, redirect to OIDC provider
 	// For now, just return a message
 	return c.HTML(http.StatusOK, "<h1>OIDC Redirect...</h1><p>(Not fully configured yet)</p>")
@@ -110,6 +116,10 @@ func (h *AuthHandler) LoginOIDC(c echo.Context) error {
 
 // CallbackOIDC handles the OIDC callback
 func (h *AuthHandler) CallbackOIDC(c echo.Context) error {
+	if !h.oidcEnabled {
+		return echo.NewHTTPError(http.StatusServiceUnavailable, "OIDC login is not enabled")
+	}
+
 	// TODO: Exchange code for token, assume role with MinIO, set cookie
 	return echo.NewHTTPError(http.StatusNotImplemented, "OIDC Callback not implemented")
 }

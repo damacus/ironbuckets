@@ -107,7 +107,7 @@ func TestUserJourney(t *testing.T) {
 	// Login uses ListBuckets to verify credentials
 	mockClient.On("ListBuckets", mock.Anything).Return([]minio.BucketInfo{}, nil)
 
-	authHandler := handlers.NewAuthHandler(authService, mockFactory, minioEndpoint)
+	authHandler := handlers.NewAuthHandler(authService, mockFactory, minioEndpoint, false)
 
 	// Setup Routes
 	e.POST("/login", authHandler.Login)
