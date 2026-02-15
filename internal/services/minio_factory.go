@@ -160,33 +160,37 @@ func (c *WrappedMinioClient) ListObjectsPaginated(ctx context.Context, bucketNam
 		minioOpts.StartAfter = opts.ContinuationToken
 	}
 
-	var objects []minio.ObjectInfo
-	var lastKey string
-
-	for obj := range c.client.ListObjects(ctx, bucketName, minioOpts) {
-		if obj.Err != nil {
-			return ListObjectsResult{}, obj.Err
-		}
-
-		objects = append(objects, obj)
-		lastKey = obj.Key
-
-		// Stop after maxKeys objects
-		if len(objects) >= maxKeys {
-			break
-		}
+	objects, isTruncated, nextToken, err := collectPaginatedObjects(c.client.ListObjects(ctx, bucketName, minioOpts), maxKeys)
+	if err != nil {
+		return ListObjectsResult{}, err
 	}
 
 	result := ListObjectsResult{
-		Objects:     objects,
-		IsTruncated: len(objects) >= maxKeys,
-	}
-
-	if result.IsTruncated {
-		result.NextContinuationToken = lastKey
+		Objects:               objects,
+		IsTruncated:           isTruncated,
+		NextContinuationToken: nextToken,
 	}
 
 	return result, nil
+}
+
+func collectPaginatedObjects(stream <-chan minio.ObjectInfo, maxKeys int) ([]minio.ObjectInfo, bool, string, error) {
+	objects := make([]minio.ObjectInfo, 0, maxKeys)
+
+	for obj := range stream {
+		if obj.Err != nil {
+			return nil, false, "", obj.Err
+		}
+
+		if len(objects) < maxKeys {
+			objects = append(objects, obj)
+			continue
+		}
+
+		return objects, true, objects[len(objects)-1].Key, nil
+	}
+
+	return objects, false, "", nil
 }
 
 func (c *WrappedMinioClient) ListObjectsChannel(ctx context.Context, bucketName string, opts minio.ListObjectsOptions) <-chan minio.ObjectInfo {
