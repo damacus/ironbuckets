@@ -156,7 +156,7 @@ func TestLoginSetsSecureCookieOverTLS(t *testing.T) {
 
 func TestLogoutClearsCookieWithMatchingSecurityAttributes(t *testing.T) {
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/logout", nil)
+	req := httptest.NewRequest(http.MethodPost, "/logout", nil)
 	req.TLS = &tls.ConnectionState{}
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
