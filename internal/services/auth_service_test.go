@@ -3,6 +3,8 @@ package services
 import (
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewAuthService_GeneratesKey(t *testing.T) {
@@ -120,6 +122,33 @@ func TestDecryptCredentials_WrongKey(t *testing.T) {
 	if err == nil {
 		t.Error("expected error when decrypting with wrong key")
 	}
+}
+
+func TestNewAuthServicePanicsInProductionWithoutKey(t *testing.T) {
+	t.Setenv("APP_ENV", "production")
+	t.Setenv("IRON_SESSION_KEY", "")
+
+	assert.Panics(t, func() {
+		NewAuthService()
+	}, "should panic in production without IRON_SESSION_KEY")
+}
+
+func TestNewAuthServicePanicsInProductionWithShortKey(t *testing.T) {
+	t.Setenv("APP_ENV", "production")
+	t.Setenv("IRON_SESSION_KEY", "tooshort")
+
+	assert.Panics(t, func() {
+		NewAuthService()
+	}, "should panic in production with a key shorter than 32 bytes")
+}
+
+func TestNewAuthServiceSucceedsInProductionWithValidKey(t *testing.T) {
+	t.Setenv("APP_ENV", "production")
+	t.Setenv("IRON_SESSION_KEY", "12345678901234567890123456789012") // exactly 32 bytes
+
+	assert.NotPanics(t, func() {
+		NewAuthService()
+	})
 }
 
 func TestEncryptCredentials_ProducesDifferentOutput(t *testing.T) {

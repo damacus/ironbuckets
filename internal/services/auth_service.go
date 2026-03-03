@@ -8,7 +8,9 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"os"
+	"strings"
 )
 
 // Credentials represents the MinIO login details
@@ -26,10 +28,15 @@ type AuthService struct {
 // NewAuthService creates a new auth service with a key from env or generates one (ephemeral)
 func NewAuthService() *AuthService {
 	key := os.Getenv("IRON_SESSION_KEY")
+	isProduction := strings.EqualFold(os.Getenv("APP_ENV"), "production")
+
 	if len(key) != 32 {
-		// In production, this should be enforced. For now, we'll warn or generate.
-		// For "The Iron Monolith" simplicity, if not set, we generate one at startup.
-		// This means sessions invalidate on restart, which is acceptable for this architecture.
+		if isProduction {
+			panic("IRON_SESSION_KEY must be exactly 32 bytes in production. " +
+				"Set APP_ENV=production and IRON_SESSION_KEY to a 32-byte secret.")
+		}
+		log.Println("WARNING: IRON_SESSION_KEY not set or not 32 bytes — " +
+			"using ephemeral key. Sessions will be invalidated on restart.")
 		newKey := make([]byte, 32)
 		if _, err := io.ReadFull(rand.Reader, newKey); err != nil {
 			panic("failed to generate random key")
