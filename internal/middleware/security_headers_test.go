@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -45,4 +46,37 @@ func TestSecurityHeadersAddsHSTSForSecureRequests(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	assert.Equal(t, "max-age=31536000; includeSubDomains", rec.Header().Get("Strict-Transport-Security"))
+}
+
+func TestSecurityHeadersCSPHasNoUnsafeInline(t *testing.T) {
+	e := echo.New()
+	e.Use(SecurityHeaders())
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "OK")
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+
+	csp := rec.Header().Get("Content-Security-Policy")
+	assert.NotContains(t, csp, "'unsafe-inline'")
+}
+
+func TestSecurityHeadersCSPContainsNonce(t *testing.T) {
+	e := echo.New()
+	e.Use(SecurityHeaders())
+	e.GET("/", func(c echo.Context) error {
+		nonce := c.Get("csp-nonce").(string)
+		return c.String(http.StatusOK, nonce)
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+
+	csp := rec.Header().Get("Content-Security-Policy")
+	nonce := strings.TrimSpace(rec.Body.String())
+	assert.NotEmpty(t, nonce)
+	assert.Contains(t, csp, "'nonce-"+nonce+"'")
 }
