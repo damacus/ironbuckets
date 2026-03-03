@@ -27,6 +27,23 @@ func TestCSRFMiddlewareRejectsPostWithoutToken(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
 
+func TestCSRFMiddlewareRejectsPlainPostWithoutToken(t *testing.T) {
+	e := echo.New()
+	e.Use(CSRF())
+	e.POST("/submit", func(c echo.Context) error {
+		return c.String(http.StatusOK, "ok")
+	})
+
+	// Regular POST with no HX-Request header — should still require CSRF token
+	req := httptest.NewRequest(http.MethodPost, "/submit", strings.NewReader("x=1"))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
+	// Note: no HX-Request header set
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+}
+
 func TestCSRFMiddlewareAllowsPostWithTokenHeaderAndCookie(t *testing.T) {
 	e := echo.New()
 	e.Use(CSRF())

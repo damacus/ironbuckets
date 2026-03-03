@@ -13,13 +13,6 @@ func CSRF() echo.MiddlewareFunc {
 		CookieName:     "csrf",
 		CookiePath:     "/",
 		CookieSameSite: http.SameSiteStrictMode,
-		Skipper: func(c echo.Context) bool {
-			switch c.Request().Method {
-			case http.MethodGet, http.MethodHead, http.MethodOptions, http.MethodTrace:
-				return false
-			}
-
-			return c.Request().Header.Get("HX-Request") != "true"
-		},
+		Skipper: echoMiddleware.DefaultSkipper,
 	})
 }
