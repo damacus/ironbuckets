@@ -33,7 +33,7 @@
     </div>
 </dialog>
 
-<script>
+<script nonce="{{ .CSPNonce }}">
 (function() {
     const dialog = document.getElementById('confirm-dialog');
     const messageEl = document.getElementById('confirm-dialog-message');
