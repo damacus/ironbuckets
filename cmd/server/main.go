@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -57,6 +58,8 @@ func newServer(minioEndpoint string) *echo.Echo {
 	e.Use(customMiddleware.CSRF())
 	// Apply auth middleware globally - it will skip public routes internally
 	e.Use(customMiddleware.AuthMiddleware(authService))
+	// AuditLog must come after AuthMiddleware so the access key is available in context
+	e.Use(customMiddleware.AuditLog(slog.Default()))
 
 	// Template Renderer
 	e.Renderer = renderer.New()
