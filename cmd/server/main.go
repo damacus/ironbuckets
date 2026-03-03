@@ -61,12 +61,32 @@ func newServer(minioEndpoint string) *echo.Echo {
 	// Template Renderer
 	e.Renderer = renderer.New()
 
+	// Rate limiter for login endpoint (10 requests/minute per IP)
+	loginRateLimiter := middleware.RateLimiterWithConfig(middleware.RateLimiterConfig{
+		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
+			middleware.RateLimiterMemoryStoreConfig{
+				Rate:      10,
+				Burst:     10,
+				ExpiresIn: time.Minute,
+			},
+		),
+		IdentifierExtractor: func(c echo.Context) (string, error) {
+			return c.RealIP(), nil
+		},
+		ErrorHandler: func(c echo.Context, err error) error {
+			return echo.NewHTTPError(http.StatusTooManyRequests, "Too many login attempts. Try again later.")
+		},
+		DenyHandler: func(c echo.Context, identifier string, err error) error {
+			return echo.NewHTTPError(http.StatusTooManyRequests, "Too many login attempts. Try again later.")
+		},
+	})
+
 	// Public Routes (auth middleware will skip these)
 	e.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "OK")
 	})
 	e.GET("/login", authHandler.LoginPage)
-	e.POST("/login", authHandler.Login)
+	e.POST("/login", authHandler.Login, loginRateLimiter)
 	e.GET("/login/oauth", authHandler.LoginOIDC)
 	e.GET("/oauth/callback", authHandler.CallbackOIDC)
 	e.GET("/logout", authHandler.Logout)
