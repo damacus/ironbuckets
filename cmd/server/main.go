@@ -89,7 +89,7 @@ func newServer(minioEndpoint string) *echo.Echo {
 	e.POST("/login", authHandler.Login, loginRateLimiter)
 	e.GET("/login/oauth", authHandler.LoginOIDC)
 	e.GET("/oauth/callback", authHandler.CallbackOIDC)
-	e.GET("/logout", authHandler.Logout)
+	e.POST("/logout", authHandler.Logout)
 
 	// Protected Routes
 	e.GET("/", func(c echo.Context) error {

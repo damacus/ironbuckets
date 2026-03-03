@@ -100,6 +100,16 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 		return echo.NewHTTPError(http.StatusInternalServerError, "Template not found: "+name)
 	}
 
+	// Inject CSRF token and CSP nonce if available
+	if m, ok := data.(map[string]interface{}); ok {
+		if token, ok := c.Get("csrf").(string); ok {
+			m["CSRFToken"] = token
+		}
+		if nonce, ok := c.Get("csp-nonce").(string); ok {
+			m["CSPNonce"] = nonce
+		}
+	}
+
 	// Templates that define their own named block execute that block directly
 	if selfExecutingTemplates[name] {
 		return tmpl.ExecuteTemplate(w, name, data)

@@ -9,7 +9,7 @@ import (
 
 func CSRF() echo.MiddlewareFunc {
 	return echoMiddleware.CSRFWithConfig(echoMiddleware.CSRFConfig{
-		TokenLookup:    "header:X-CSRF-Token",
+		TokenLookup:    "header:X-CSRF-Token,form:_csrf",
 		CookieName:     "csrf",
 		CookiePath:     "/",
 		CookieSameSite: http.SameSiteStrictMode,
