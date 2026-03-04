@@ -64,8 +64,18 @@ jobs:
 
       - name: Wait for services
         run: |
-          echo "Waiting for services to be ready..."
-          sleep 10
+          echo "Waiting for app health endpoint..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080/health > /dev/null; then
+              echo "App is ready after ${i} attempts"
+              exit 0
+            fi
+            echo "Attempt ${i}/30 - not ready yet, waiting 5s..."
+            sleep 5
+          done
+          echo "App did not become ready in time"
+          docker compose -f docker-compose.yml logs
+          exit 1
 
       - name: Run E2E tests
         run: npx playwright test --project=chromium
