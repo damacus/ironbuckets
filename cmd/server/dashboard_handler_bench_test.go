@@ -27,14 +27,12 @@ func BenchmarkGetUsersWidget(b *testing.B) {
 	// Setup user mock responses
 	numUsers := 100
 	usersMap := make(map[string]madmin.UserInfo)
-	usersList := make([]string, 0, numUsers)
 
 	for i := 0; i < numUsers; i++ {
 		username := fmt.Sprintf("user%d", i)
 		usersMap[username] = madmin.UserInfo{
 			Status: "enabled",
 		}
-		usersList = append(usersList, username)
 	}
 
 	svcAccountsResp := madmin.ListServiceAccountsResp{
