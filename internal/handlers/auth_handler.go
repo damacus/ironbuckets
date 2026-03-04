@@ -38,7 +38,7 @@ func (h *AuthHandler) LoginPage(c echo.Context) error {
 		// Optionally we could clear it here too, but the login post will overwrite it.
 	}
 	// We use a specific "login" template set that doesn't use the main sidebar layout
-	return c.Render(http.StatusOK, "login", nil)
+	return c.Render(http.StatusOK, "login", map[string]interface{}{})
 }
 
 // Login handles the form submission

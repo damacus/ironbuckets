@@ -41,4 +41,5 @@ func TestAuditLogWritesStructuredEntry(t *testing.T) {
 	assert.Equal(t, "admin-key", entry["user"])
 	assert.NotEmpty(t, entry["remote_ip"])
 	assert.NotEmpty(t, entry["time"])
+	assert.Equal(t, float64(http.StatusOK), entry["status"])
 }

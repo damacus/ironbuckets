@@ -13,7 +13,7 @@ const cspBase = "default-src 'self'; " +
 	"script-src 'self' 'nonce-%s'; " +
 	"style-src 'self' 'nonce-%s'; " +
 	"img-src 'self' data: https:; " +
-	"font-src 'self' https://fonts.gstatic.com; " +
+	"font-src 'self'; " +
 	"connect-src 'self'; " +
 	"frame-ancestors 'none'; " +
 	"base-uri 'self'; " +

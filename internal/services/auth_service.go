@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"log"
+	"log/slog"
 	"os"
 	"strings"
 )
@@ -35,8 +35,7 @@ func NewAuthService() *AuthService {
 			panic("IRON_SESSION_KEY must be exactly 32 bytes in production. " +
 				"Set APP_ENV=production and IRON_SESSION_KEY to a 32-byte secret.")
 		}
-		log.Println("WARNING: IRON_SESSION_KEY not set or not 32 bytes — " +
-			"using ephemeral key. Sessions will be invalidated on restart.")
+		slog.Warn("IRON_SESSION_KEY not set or not 32 bytes — using ephemeral key. Sessions will be invalidated on restart.")
 		newKey := make([]byte, 32)
 		if _, err := io.ReadFull(rand.Reader, newKey); err != nil {
 			panic("failed to generate random key")

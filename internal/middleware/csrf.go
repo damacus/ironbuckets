@@ -13,6 +13,10 @@ func CSRF() echo.MiddlewareFunc {
 		CookieName:     "csrf",
 		CookiePath:     "/",
 		CookieSameSite: http.SameSiteStrictMode,
+		// CookieHTTPOnly is intentionally false: HTMX reads the CSRF cookie from
+		// JavaScript (document.cookie) to attach it as the X-CSRF-Token header.
+		// CookieSecure is intentionally false here; TLS deployments should set it
+		// via an environment-aware wrapper if needed.
 		Skipper: echoMiddleware.DefaultSkipper,
 	})
 }

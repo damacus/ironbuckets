@@ -137,9 +137,12 @@
                 <div class="font-medium text-white">Sign Out</div>
                 <div class="text-xs text-zinc-500 mt-1">End your current session securely.</div>
             </div>
-            <a href="/logout" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/50 text-red-500 px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2">
-                <i data-lucide="log-out" size="16"></i> Sign Out
-            </a>
+            <form method="POST" action="/logout">
+                <input type="hidden" name="_csrf" value="{{ .CSRFToken }}">
+                <button type="submit" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/50 text-red-500 px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2">
+                    <i data-lucide="log-out" size="16"></i> Sign Out
+                </button>
+            </form>
         </div>
     </div>
 </div>

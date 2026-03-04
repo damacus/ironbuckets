@@ -19,7 +19,7 @@ import (
 func main() {
 	minioEndpoint, usedDefault := resolveMinioEndpoint()
 	if usedDefault {
-		log.Printf("MINIO_ENDPOINT not set, using local default: %s", minioEndpoint)
+		slog.Warn("MINIO_ENDPOINT not set, using local default", "endpoint", minioEndpoint)
 	}
 
 	e := newServer(minioEndpoint)
