@@ -19,8 +19,9 @@ func main() {
 	// Load MinIO endpoint from environment
 	minioEndpoint := os.Getenv("MINIO_ENDPOINT")
 	if minioEndpoint == "" {
-		minioEndpoint = "play.min.io:9000" // Default for development
-		log.Printf("MINIO_ENDPOINT not set, using default: %s", minioEndpoint)
+		minioEndpoint = "play.min.io:9000"
+		log.Println("WARNING: MINIO_ENDPOINT not set — using public MinIO demo (play.min.io:9000). " +
+			"Do NOT use in production. Set MINIO_ENDPOINT in your environment.")
 	}
 
 	e := newServer(minioEndpoint)
@@ -84,14 +85,26 @@ func newServer(minioEndpoint string) *echo.Echo {
 		},
 	})
 
+	// Upload size limit (configurable via MAX_UPLOAD_SIZE, default 100MB)
+	maxUploadSize := os.Getenv("MAX_UPLOAD_SIZE")
+	if maxUploadSize == "" {
+		maxUploadSize = "100MB"
+	}
+	uploadLimit := middleware.BodyLimit(maxUploadSize)
+
+	// Static assets
+	e.Static("/static", "views/static")
+
 	// Public Routes (auth middleware will skip these)
 	e.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "OK")
 	})
 	e.GET("/login", authHandler.LoginPage)
 	e.POST("/login", authHandler.Login, loginRateLimiter)
-	e.GET("/login/oauth", authHandler.LoginOIDC)
-	e.GET("/oauth/callback", authHandler.CallbackOIDC)
+	if os.Getenv("ENABLE_OIDC") == "true" {
+		e.GET("/login/oauth", authHandler.LoginOIDC)
+		e.GET("/oauth/callback", authHandler.CallbackOIDC)
+	}
 	e.POST("/logout", authHandler.Logout)
 
 	// Protected Routes
@@ -142,7 +155,7 @@ func newServer(minioEndpoint string) *echo.Echo {
 
 	// Object Browser
 	e.GET("/buckets/:bucketName", bucketsHandler.BrowseBucket)
-	e.POST("/buckets/:bucketName/upload", bucketsHandler.UploadObject)
+	e.POST("/buckets/:bucketName/upload", bucketsHandler.UploadObject, uploadLimit)
 	e.POST("/buckets/:bucketName/delete", bucketsHandler.DeleteObject)
 	e.GET("/buckets/:bucketName/download", bucketsHandler.DownloadObject)
 	e.GET("/buckets/:bucketName/zip", bucketsHandler.DownloadZip)
