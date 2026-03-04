@@ -8,31 +8,15 @@
     <title>IronBuckets (Go/Admin)</title>
 
     <!-- Tailwind CSS -->
-    <script nonce="{{ .CSPNonce }}" src="https://cdn.tailwindcss.com"></script>
-    <script nonce="{{ .CSPNonce }}">
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        background: '#09090b', // Zinc 950
-                        surface: '#18181b', // Zinc 900
-                        border: '#27272a', // Zinc 800
-                        accent: '#2563eb', // Blue 600
-                    },
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
+    <link rel="stylesheet" href="/static/tailwind.css" nonce="{{ .CSPNonce }}">
 
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script nonce="{{ .CSPNonce }}" src="https://unpkg.com/lucide@0.445.0"></script>
+    <script nonce="{{ .CSPNonce }}" src="/static/lucide.min.js"></script>
     <!-- HTMX -->
-    <script nonce="{{ .CSPNonce }}" src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script nonce="{{ .CSPNonce }}" src="/static/htmx.min.js"></script>
     <!-- Alpine.js -->
-    <script nonce="{{ .CSPNonce }}" defer src="https://unpkg.com/@alpinejs/csp@3.14.8/dist/cdn.min.js"></script>
+    <script nonce="{{ .CSPNonce }}" defer src="/static/alpine-csp.min.js"></script>
 
     <style nonce="{{ .CSPNonce }}">
         body {

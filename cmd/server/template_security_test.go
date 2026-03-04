@@ -37,7 +37,9 @@ func TestTemplatesUseCSPCompatibleAlpineBuild(t *testing.T) {
 		require.NoError(t, err)
 		content := string(contentBytes)
 
-		assert.Contains(t, content, "@alpinejs/csp@3.14.8", file)
+		// Alpine.js is vendored locally; the CSP build is served from /static
+		assert.Contains(t, content, "alpine-csp.min.js", file)
+		assert.NotContains(t, content, "alpinejs/dist/cdn.min.js", file) // non-CSP build must not be used
 	}
 }
 
