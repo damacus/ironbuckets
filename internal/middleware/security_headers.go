@@ -4,8 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	"strings"
 
+	"github.com/damacus/iron-buckets/internal/utils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -47,19 +47,11 @@ func SecurityHeaders() echo.MiddlewareFunc {
 			headers.Set("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
 			headers.Set("Content-Security-Policy", fmt.Sprintf(cspBase, nonce, nonce))
 
-			if isSecureRequest(c) {
+			if utils.IsSecureRequest(c.Request()) {
 				headers.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
 			}
 
 			return next(c)
 		}
 	}
-}
-
-func isSecureRequest(c echo.Context) bool {
-	req := c.Request()
-	if req.TLS != nil {
-		return true
-	}
-	return strings.EqualFold(req.Header.Get("X-Forwarded-Proto"), "https")
 }

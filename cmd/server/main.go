@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/damacus/iron-buckets/internal/handlers"
@@ -16,12 +17,9 @@ import (
 )
 
 func main() {
-	// Load MinIO endpoint from environment
-	minioEndpoint := os.Getenv("MINIO_ENDPOINT")
-	if minioEndpoint == "" {
-		minioEndpoint = "play.min.io:9000"
-		log.Println("WARNING: MINIO_ENDPOINT not set — using public MinIO demo (play.min.io:9000). " +
-			"Do NOT use in production. Set MINIO_ENDPOINT in your environment.")
+	minioEndpoint, usedDefault := resolveMinioEndpoint()
+	if usedDefault {
+		log.Printf("MINIO_ENDPOINT not set, using local default: %s", minioEndpoint)
 	}
 
 	e := newServer(minioEndpoint)
@@ -30,13 +28,23 @@ func main() {
 	e.Logger.Fatal(e.Start(":8080"))
 }
 
+func resolveMinioEndpoint() (string, bool) {
+	minioEndpoint := os.Getenv("MINIO_ENDPOINT")
+	if minioEndpoint == "" {
+		return "localhost:9000", true
+	}
+
+	return minioEndpoint, false
+}
+
 func newServer(minioEndpoint string) *echo.Echo {
 	e := echo.New()
 
 	// Services
 	authService := services.NewAuthService()
 	minioFactory := &services.RealMinioFactory{}
-	authHandler := handlers.NewAuthHandler(authService, minioFactory, minioEndpoint)
+	oidcEnabled := oidcEnabledFromEnv()
+	authHandler := handlers.NewAuthHandler(authService, minioFactory, minioEndpoint, oidcEnabled)
 	usersHandler := handlers.NewUsersHandler(minioFactory)
 	groupsHandler := handlers.NewGroupsHandler(minioFactory)
 	bucketsHandler := handlers.NewBucketsHandler(minioFactory)
@@ -96,18 +104,41 @@ func newServer(minioEndpoint string) *echo.Echo {
 	e.Static("/static", "views/static")
 
 	// Public Routes (auth middleware will skip these)
+	registerPublicRoutes(e, authHandler, oidcEnabled, loginRateLimiter)
+
+	// Protected Routes
+	registerProtectedRoutes(e, drivesHandler, dashboardHandler, usersHandler, groupsHandler, bucketsHandler, settingsHandler, uploadLimit)
+
+	return e
+}
+
+func oidcEnabledFromEnv() bool {
+	return strings.EqualFold(os.Getenv("OIDC_ENABLED"), "true")
+}
+
+func registerPublicRoutes(e *echo.Echo, authHandler *handlers.AuthHandler, oidcEnabled bool, rateLimiters ...echo.MiddlewareFunc) {
 	e.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "OK")
 	})
 	e.GET("/login", authHandler.LoginPage)
-	e.POST("/login", authHandler.Login, loginRateLimiter)
-	if os.Getenv("ENABLE_OIDC") == "true" {
+	e.POST("/login", authHandler.Login, rateLimiters...)
+	if oidcEnabled {
 		e.GET("/login/oauth", authHandler.LoginOIDC)
 		e.GET("/oauth/callback", authHandler.CallbackOIDC)
 	}
 	e.POST("/logout", authHandler.Logout)
+}
 
-	// Protected Routes
+func registerProtectedRoutes(
+	e *echo.Echo,
+	drivesHandler *handlers.DrivesHandler,
+	dashboardHandler *handlers.DashboardHandler,
+	usersHandler *handlers.UsersHandler,
+	groupsHandler *handlers.GroupsHandler,
+	bucketsHandler *handlers.BucketsHandler,
+	settingsHandler *handlers.SettingsHandler,
+	uploadLimit echo.MiddlewareFunc,
+) {
 	e.GET("/", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "dashboard", map[string]interface{}{
 			"ActiveNav": "dashboard",
@@ -182,6 +213,4 @@ func newServer(minioEndpoint string) *echo.Echo {
 	e.GET("/settings", settingsHandler.ShowSettings)
 	e.POST("/settings/restart", settingsHandler.RestartService)
 	e.GET("/settings/logs", settingsHandler.GetLogs)
-
-	return e
 }

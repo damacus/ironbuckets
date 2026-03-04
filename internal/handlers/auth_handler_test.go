@@ -133,7 +133,7 @@ func TestLoginSetsSecureCookieOverTLS(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	authService := services.NewAuthService()
-	handler := NewAuthHandler(authService, &authTestFactory{client: &authTestMinioClient{}}, "play.min.io:9000")
+	handler := NewAuthHandler(authService, &authTestFactory{client: &authTestMinioClient{}}, "play.min.io:9000", false)
 
 	err := handler.Login(c)
 	require.NoError(t, err)
@@ -161,7 +161,7 @@ func TestLogoutClearsCookieWithMatchingSecurityAttributes(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	handler := NewAuthHandler(services.NewAuthService(), &authTestFactory{client: &authTestMinioClient{}}, "play.min.io:9000")
+	handler := NewAuthHandler(services.NewAuthService(), &authTestFactory{client: &authTestMinioClient{}}, "play.min.io:9000", false)
 
 	err := handler.Logout(c)
 	require.NoError(t, err)
@@ -182,4 +182,20 @@ func TestLogoutClearsCookieWithMatchingSecurityAttributes(t *testing.T) {
 	assert.Equal(t, http.SameSiteStrictMode, sessionCookie.SameSite)
 	assert.True(t, sessionCookie.Secure)
 	assert.Equal(t, "/", sessionCookie.Path)
+}
+
+func TestLoginOIDCReturnsDisabledErrorWhenFeatureFlagOff(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/login/oauth", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	handler := NewAuthHandler(services.NewAuthService(), &authTestFactory{client: &authTestMinioClient{}}, "play.min.io:9000", false)
+
+	err := handler.LoginOIDC(c)
+	require.Error(t, err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	require.True(t, ok)
+	assert.Equal(t, http.StatusServiceUnavailable, httpErr.Code)
 }

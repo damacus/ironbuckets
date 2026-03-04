@@ -107,11 +107,11 @@ func TestUserJourney(t *testing.T) {
 	// Login uses ListBuckets to verify credentials
 	mockClient.On("ListBuckets", mock.Anything).Return([]minio.BucketInfo{}, nil)
 
-	authHandler := handlers.NewAuthHandler(authService, mockFactory, minioEndpoint)
+	authHandler := handlers.NewAuthHandler(authService, mockFactory, minioEndpoint, false)
 
 	// Setup Routes
 	e.POST("/login", authHandler.Login)
-	e.GET("/logout", authHandler.Logout)
+	e.POST("/logout", authHandler.Logout)
 
 	// Protected Group
 	app := e.Group("")
@@ -157,7 +157,7 @@ func TestUserJourney(t *testing.T) {
 	assert.Equal(t, "Dashboard", recDash.Body.String())
 
 	// Step C: Logout
-	reqLogout := httptest.NewRequest(http.MethodGet, "/logout", nil)
+	reqLogout := httptest.NewRequest(http.MethodPost, "/logout", nil)
 	reqLogout.AddCookie(ironSeal)
 	recLogout := httptest.NewRecorder()
 
