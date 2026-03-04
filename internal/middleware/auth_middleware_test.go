@@ -16,8 +16,6 @@ func TestAuthMiddleware_SkipsPublicRoutes(t *testing.T) {
 		"/login",
 		"/health",
 		"/logout",
-		"/login/oauth",
-		"/oauth/callback",
 	}
 
 	authService := services.NewAuthService()

@@ -14,8 +14,7 @@ func AuthMiddleware(authService *services.AuthService) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			// Skip for public routes
 			path := c.Request().URL.Path
-			if path == "/login" || path == "/health" || path == "/logout" ||
-				path == "/login/oauth" || path == "/oauth/callback" {
+			if path == "/login" || path == "/health" || path == "/logout" {
 				return next(c)
 			}
 
