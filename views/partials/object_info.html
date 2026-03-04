@@ -12,7 +12,7 @@
                         <p class="text-sm text-zinc-500">Object Details</p>
                     </div>
                 </div>
-                <button onclick="document.getElementById('object-info-dialog').close(); document.getElementById('object-info-dialog').remove();" class="text-zinc-500 hover:text-white">
+                <button id="object-info-close-btn" class="text-zinc-500 hover:text-white">
                     <i data-lucide="x" size="20"></i>
                 </button>
             </div>
@@ -89,7 +89,7 @@
             </div>
 
             <div class="flex justify-end">
-                <button onclick="document.getElementById('object-info-dialog').close(); document.getElementById('object-info-dialog').remove();"
+                <button id="object-info-close-footer-btn"
                     class="bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                     Close
                 </button>
@@ -101,19 +101,17 @@
     lucide.createIcons();
     (function() {
         const dialog = document.getElementById('object-info-dialog');
+        const closeDialog = () => { dialog.close(); dialog.remove(); };
+        // Close buttons
+        document.getElementById('object-info-close-btn').addEventListener('click', closeDialog);
+        document.getElementById('object-info-close-footer-btn').addEventListener('click', closeDialog);
         // Close on backdrop click
         dialog.addEventListener('click', (e) => {
-            if (e.target === dialog) {
-                dialog.close();
-                dialog.remove();
-            }
+            if (e.target === dialog) closeDialog();
         });
         // Close on Escape key
         dialog.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                dialog.close();
-                dialog.remove();
-            }
+            if (e.key === 'Escape') closeDialog();
         });
     })();
 </script>

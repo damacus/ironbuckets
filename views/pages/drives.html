@@ -7,7 +7,7 @@
             <p class="text-sm text-zinc-400 mt-1">{{ .OnlineCount }} of {{ .TotalCount }} drives online</p>
             {{ end }}
         </div>
-        <button onclick="window.location.reload()" class="bg-white text-black px-4 py-2 rounded-md text-sm font-semibold hover:bg-zinc-200 flex items-center gap-2">
+        <button @click="window.location.reload()" class="bg-white text-black px-4 py-2 rounded-md text-sm font-semibold hover:bg-zinc-200 flex items-center gap-2">
             <i data-lucide="refresh-cw" size="16"></i> Refresh
         </button>
     </div>

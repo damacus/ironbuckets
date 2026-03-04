@@ -82,9 +82,12 @@ func TestBucketsDropdownIsHiddenByDefaultAndToggledByButton(t *testing.T) {
 	require.NoError(t, err)
 	content := string(contentBytes)
 
-	assert.Contains(t, content, `nextElementSibling`)
-	assert.Contains(t, content, `.classList.toggle('hidden')`)
-	assert.Contains(t, content, `class="hidden absolute`)
+	// Dropdown uses Alpine.js x-show with open:false (hidden by default), toggled via @click
+	assert.Contains(t, content, `x-data="{ open: false }"`)
+	assert.Contains(t, content, `x-show="open"`)
+	assert.Contains(t, content, `@click.stop="open = !open"`)
+	// Ensure no inline onclick handlers remain for this toggle
+	assert.NotContains(t, content, `.classList.toggle('hidden')`)
 }
 
 func TestBrowserUploadProgressModalIsHiddenByDefault(t *testing.T) {

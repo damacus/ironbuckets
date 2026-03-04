@@ -1,13 +1,13 @@
 {{ define "bucket_create_modal" }}
 <!-- Modal Backdrop -->
-<div id="bucket-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+<div id="bucket-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" x-data>
     <!-- Modal Content -->
     <div class="bg-surface border border-border rounded-xl p-6 w-full max-w-md">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-white">Create New Bucket</h3>
             <button
                 class="text-zinc-500 hover:text-white"
-                onclick="document.getElementById('bucket-modal').remove()">
+                @click="document.getElementById('bucket-modal').remove()">
                 <i data-lucide="x" size="20"></i>
             </button>
         </div>
@@ -70,7 +70,7 @@
             <div class="flex gap-3 pt-2">
                 <button
                     type="button"
-                    onclick="document.getElementById('bucket-modal').remove()"
+                    @click="document.getElementById('bucket-modal').remove()"
                     class="flex-1 bg-zinc-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-zinc-700">
                     Cancel
                 </button>

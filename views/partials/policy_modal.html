@@ -4,7 +4,7 @@
         <div class="bg-surface border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-white">Manage Policy</h3>
-                <button onclick="document.getElementById('policy-dialog').close()"
+                <button id="policy-dialog-close-btn"
                     class="p-1 text-zinc-400 hover:text-white">
                     <i data-lucide="x" size="18"></i>
                 </button>
@@ -25,7 +25,7 @@
                 </div>
 
                 <div class="flex gap-3">
-                    <button type="button" onclick="document.getElementById('policy-dialog').close()"
+                    <button type="button" id="policy-dialog-cancel-btn"
                         class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                         Cancel
                     </button>
@@ -40,5 +40,11 @@
 </dialog>
 <script nonce="{{ .CSPNonce }}">
     lucide.createIcons();
+    (function() {
+        const dialog = document.getElementById('policy-dialog');
+        const closeDialog = () => dialog.close();
+        document.getElementById('policy-dialog-close-btn').addEventListener('click', closeDialog);
+        document.getElementById('policy-dialog-cancel-btn').addEventListener('click', closeDialog);
+    })();
 </script>
 {{ end }}

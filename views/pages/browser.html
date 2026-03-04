@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .BucketName }} - IronBuckets</title>
     <link rel="stylesheet" href="/static/tailwind.css" nonce="{{ .CSPNonce }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/fonts.css" nonce="{{ .CSPNonce }}">
     <script nonce="{{ .CSPNonce }}" src="/static/lucide.min.js"></script>
     <script nonce="{{ .CSPNonce }}" src="/static/htmx.min.js"></script>
     <script nonce="{{ .CSPNonce }}" defer src="/static/alpine-csp.min.js"></script>
@@ -51,10 +51,13 @@
         </nav>
 
         <div class="p-4 border-t border-border">
-            <a href="/logout" class="flex items-center gap-3 px-3 py-2 rounded-md text-zinc-400 hover:text-white transition-colors">
-                <i data-lucide="log-out" size="18"></i>
-                <span class="text-sm font-medium">Sign out</span>
-            </a>
+            <form method="POST" action="/logout">
+                <input type="hidden" name="_csrf" value="{{ .CSRFToken }}">
+                <button type="submit" class="flex items-center gap-3 px-3 py-2 rounded-md text-zinc-400 hover:text-white transition-colors w-full">
+                    <i data-lucide="log-out" size="18"></i>
+                    <span class="text-sm font-medium">Sign out</span>
+                </button>
+            </form>
         </div>
     </aside>
 
@@ -98,7 +101,7 @@
                 </button>
                 <!-- Upload Button -->
                 <button
-                    onclick="document.getElementById('upload-input').click()"
+                    @click="$refs.uploadInput.click()"
                     class="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">
                     <i data-lucide="upload" size="16"></i>
                     Upload
@@ -109,7 +112,7 @@
                     hx-swap="none"
                     hx-on::after-request="window.location.reload()"
                     class="hidden">
-                    <input type="file" name="file" id="upload-input" multiple onchange="htmx.trigger('#upload-form', 'submit')">
+                    <input type="file" name="file" id="upload-input" x-ref="uploadInput" multiple @change="htmx.trigger('#upload-form', 'submit')">
                 </form>
                 </div>
             </div>
@@ -185,8 +188,8 @@
                     <tbody class="divide-y divide-border" id="object-list">
                         <!-- Folders -->
                         {{ range .Folders }}
-                        <tr class="group hover:bg-zinc-800/50 transition-colors cursor-pointer" onclick="window.location.href='/buckets/{{ $.BucketName }}?prefix={{ .Prefix }}'">
-                            <td class="px-4 py-4" onclick="event.stopPropagation()">
+                        <tr class="group hover:bg-zinc-800/50 transition-colors cursor-pointer" @click="window.location.href='/buckets/{{ $.BucketName }}?prefix={{ .Prefix }}'">
+                            <td class="px-4 py-4" @click.stop>
                                 <!-- Folders not selectable -->
                             </td>
                             <td class="px-4 py-4">
@@ -197,7 +200,7 @@
                             </td>
                             <td class="px-4 py-4 text-zinc-500">--</td>
                             <td class="px-4 py-4 text-zinc-500">--</td>
-                            <td class="px-4 py-4 text-right" onclick="event.stopPropagation()">
+                            <td class="px-4 py-4 text-right" @click.stop>
                                 <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <a href="/buckets/{{ $.BucketName }}/zip?prefix={{ .Prefix }}"
                                         class="p-2 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-md transition-colors"

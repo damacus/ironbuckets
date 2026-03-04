@@ -1,5 +1,5 @@
 {{ define "share_link" }}
-<dialog id="share-dialog" class="bg-transparent p-0 m-0 max-w-none w-full h-full backdrop:bg-black/60" open>
+<dialog id="share-dialog" class="bg-transparent p-0 m-0 max-w-none w-full h-full backdrop:bg-black/60" open x-data>
     <div class="fixed inset-0 flex items-center justify-center p-4">
         <div class="bg-surface border border-border rounded-xl p-6 w-full max-w-lg shadow-2xl">
             <div class="flex items-start gap-4 mb-6">
@@ -18,7 +18,7 @@
                     <div class="flex items-center gap-2">
                         <input type="text" readonly value="{{ .URL }}" id="share-url"
                             class="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm font-mono text-white truncate" />
-                        <button onclick="copyShareUrl()"
+                        <button id="share-copy-btn"
                             class="p-2 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-md transition-colors" title="Copy">
                             <i data-lucide="copy" size="16"></i>
                         </button>
@@ -45,7 +45,7 @@
             </div>
 
             <div class="flex justify-end">
-                <button onclick="document.getElementById('share-dialog').close(); document.getElementById('share-dialog').remove();"
+                <button id="share-done-btn"
                     class="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                     Done
                 </button>
@@ -56,28 +56,26 @@
 <script nonce="{{ .CSPNonce }}">
     lucide.createIcons();
 
-    function copyShareUrl() {
-        const url = document.getElementById('share-url').value;
-        navigator.clipboard.writeText(url).then(() => {
-            // Optional: show a toast notification
-        });
-    }
-
     (function() {
         const dialog = document.getElementById('share-dialog');
+        const closeDialog = () => { dialog.close(); dialog.remove(); };
+
+        // Copy button
+        document.getElementById('share-copy-btn').addEventListener('click', function() {
+            const url = document.getElementById('share-url').value;
+            navigator.clipboard.writeText(url);
+        });
+
+        // Done button
+        document.getElementById('share-done-btn').addEventListener('click', closeDialog);
+
         // Close on backdrop click
         dialog.addEventListener('click', (e) => {
-            if (e.target === dialog) {
-                dialog.close();
-                dialog.remove();
-            }
+            if (e.target === dialog) closeDialog();
         });
         // Close on Escape key
         dialog.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                dialog.close();
-                dialog.remove();
-            }
+            if (e.key === 'Escape') closeDialog();
         });
     })();
 </script>

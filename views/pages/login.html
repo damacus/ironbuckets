@@ -6,14 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - IronBuckets</title>
     <link rel="stylesheet" href="/static/tailwind.css" nonce="{{ .CSPNonce }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/fonts.css" nonce="{{ .CSPNonce }}">
     <script nonce="{{ .CSPNonce }}" src="/static/lucide.min.js"></script>
     <script nonce="{{ .CSPNonce }}" src="/static/htmx.min.js"></script>
-    <style nonce="{{ .CSPNonce }}">body { font-family: 'Inter', sans-serif; }</style>
+    <script nonce="{{ .CSPNonce }}" defer src="/static/alpine-csp.min.js"></script>
+    <style nonce="{{ .CSPNonce }}">body { font-family: 'Inter', sans-serif; } [x-cloak] { display: none !important; }</style>
 </head>
 <body class="bg-background text-zinc-100 h-screen w-screen flex items-center justify-center">
 
-        <div class="w-full max-w-md p-8 space-y-8 bg-surface border border-border rounded-xl shadow-2xl">
+        <div class="w-full max-w-md p-8 space-y-8 bg-surface border border-border rounded-xl shadow-2xl" x-data="{ activeTab: 'creds' }">
         <div class="flex flex-col items-center gap-2">
             <div class="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center">
                 <i data-lucide="box" class="text-black w-6 h-6"></i>
@@ -23,12 +24,16 @@
         </div>
 
         <!-- Tabs -->
-        <div class="flex border-b border-zinc-800" _="on click take .text-white from .text-zinc-400 for target then add .text-white to target">
-            <button class="flex-1 pb-2 text-sm font-medium text-white border-b-2 border-white" onclick="document.getElementById('form-creds').classList.remove('hidden'); document.getElementById('form-sso').classList.add('hidden'); this.classList.add('border-white', 'text-white'); this.nextElementSibling.classList.remove('border-white', 'text-white'); this.nextElementSibling.classList.add('text-zinc-400', 'border-transparent');">Credentials</button>
-            <button class="flex-1 pb-2 text-sm font-medium text-zinc-400 border-b-2 border-transparent hover:text-zinc-300" onclick="document.getElementById('form-sso').classList.remove('hidden'); document.getElementById('form-creds').classList.add('hidden'); this.classList.add('border-white', 'text-white'); this.classList.remove('text-zinc-400', 'border-transparent'); this.previousElementSibling.classList.remove('border-white', 'text-white'); this.previousElementSibling.classList.add('text-zinc-400', 'border-transparent');">SSO</button>
+        <div class="flex border-b border-zinc-800">
+            <button class="flex-1 pb-2 text-sm font-medium border-b-2 transition-colors"
+                :class="activeTab === 'creds' ? 'text-white border-white' : 'text-zinc-400 border-transparent hover:text-zinc-300'"
+                @click="activeTab = 'creds'">Credentials</button>
+            <button class="flex-1 pb-2 text-sm font-medium border-b-2 transition-colors"
+                :class="activeTab === 'sso' ? 'text-white border-white' : 'text-zinc-400 border-transparent hover:text-zinc-300'"
+                @click="activeTab = 'sso'">SSO</button>
         </div>
 
-        <form id="form-creds" class="mt-8 space-y-6" hx-post="/login" hx-swap="outerHTML">
+        <form id="form-creds" class="mt-8 space-y-6" hx-post="/login" hx-swap="outerHTML" x-show="activeTab === 'creds'">
             <div class="space-y-4 rounded-md shadow-sm">
                 <div>
                     <label for="accessKey" class="block text-sm font-medium text-zinc-400 mb-1">Access Key / Username</label>
@@ -54,7 +59,7 @@
             </div>
         </form>
 
-        <div id="form-sso" class="mt-8 space-y-6 hidden">
+        <div id="form-sso" class="mt-8 space-y-6" x-show="activeTab === 'sso'" x-cloak>
              <div class="space-y-4">
                 <p class="text-sm text-zinc-400 text-center">Sign in with your Identity Provider</p>
 
