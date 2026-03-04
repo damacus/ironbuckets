@@ -38,7 +38,7 @@ func AuthMiddleware(authService *services.AuthService) echo.MiddlewareFunc {
 					Path:     "/",
 					HttpOnly: true,
 					SameSite: http.SameSiteStrictMode,
-					Secure:   isSecureRequest(c),
+					Secure:   utils.IsSecureRequest(c.Request()),
 				})
 				return c.Redirect(http.StatusSeeOther, "/login")
 			}
