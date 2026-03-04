@@ -49,6 +49,7 @@ type MinioAdminClient interface {
 
 	// Service Account methods
 	ListServiceAccounts(ctx context.Context, user string) (madmin.ListServiceAccountsResp, error)
+	ListAccessKeysBulk(ctx context.Context, users []string, opts madmin.ListAccessKeysOpts) (map[string]madmin.ListAccessKeysResp, error)
 	AddServiceAccount(ctx context.Context, opts madmin.AddServiceAccountReq) (madmin.Credentials, error)
 	DeleteServiceAccount(ctx context.Context, serviceAccount string) error
 
