@@ -130,7 +130,6 @@ func (m *mockUsersAdminClient) UpdateGroupMembers(ctx context.Context, req madmi
 func (m *mockUsersAdminClient) SetGroupStatus(ctx context.Context, group string, status madmin.GroupStatus) error {
 	return nil
 }
-
 func (m *mockUsersAdminClient) ListAccessKeysBulk(ctx context.Context, users []string, opts madmin.ListAccessKeysOpts) (map[string]madmin.ListAccessKeysResp, error) {
 	return nil, nil
 }
