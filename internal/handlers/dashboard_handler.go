@@ -8,6 +8,7 @@ import (
 	"github.com/damacus/iron-buckets/internal/services"
 	"github.com/damacus/iron-buckets/internal/utils"
 	"github.com/labstack/echo/v4"
+	"github.com/minio/madmin-go/v3"
 )
 
 type DashboardHandler struct {
@@ -92,15 +93,24 @@ func (h *DashboardHandler) GetUsersWidget(c echo.Context) error {
 	totalServiceAccounts := 0
 	activeServiceAccounts := 0
 	ctx := c.Request().Context()
+
+	var userList []string
 	for username := range users {
-		accounts, err := mdm.ListServiceAccounts(ctx, username)
-		if err != nil {
-			continue // Skip users we can't fetch service accounts for
-		}
-		for _, acc := range accounts.Accounts {
-			totalServiceAccounts++
-			if acc.AccountStatus == "on" {
-				activeServiceAccounts++
+		userList = append(userList, username)
+	}
+
+	if len(userList) > 0 {
+		bulkAccounts, err := mdm.ListAccessKeysBulk(ctx, userList, madmin.ListAccessKeysOpts{
+			ListType: madmin.AccessKeyListSvcaccOnly,
+		})
+		if err == nil {
+			for _, accounts := range bulkAccounts {
+				for _, acc := range accounts.ServiceAccounts {
+					totalServiceAccounts++
+					if acc.AccountStatus == "on" {
+						activeServiceAccounts++
+					}
+				}
 			}
 		}
 	}
