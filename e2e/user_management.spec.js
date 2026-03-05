@@ -74,11 +74,11 @@ test.describe('User Management Journey', () => {
     await expect(page.locator(`text=${newUsername}`)).toBeVisible();
 
     // Step 6: Logout as admin
-    await page.click('a[href="/logout"]');
-    await expect(page).toHaveURL(`${APP_URL}/login`);
+    await page.click('form[action="/logout"] button[type="submit"]');
+    await page.waitForURL(`${APP_URL}/login`);
 
     // Step 7: Login as newly created user
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.fill('input[name="accessKey"]', newUsername);
     await page.fill('input[name="secretKey"]', newPassword);
     await page.click('button[type="submit"]');

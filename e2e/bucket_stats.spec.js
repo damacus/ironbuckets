@@ -40,6 +40,7 @@ test.describe('Bucket Stats', () => {
 
 		// Login
 		await page.goto(`${APP_URL}/login`);
+		await page.waitForLoadState('domcontentloaded');
 		console.log('beforeEach: Navigated to login');
 		await page.fill('input[name="accessKey"]', ADMIN_USER);
 		await page.fill('input[name="secretKey"]', ADMIN_PASSWORD);

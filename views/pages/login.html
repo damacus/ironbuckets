@@ -33,7 +33,7 @@
                 @click="activeTab = 'sso'">SSO</button>
         </div>
 
-        <form id="form-creds" class="mt-8 space-y-6" hx-post="/login" hx-swap="outerHTML" x-show="activeTab === 'creds'">
+        <form id="form-creds" class="mt-8 space-y-6" hx-post="/login" hx-swap="outerHTML">
             <div class="space-y-4 rounded-md shadow-sm">
                 <div>
                     <label for="accessKey" class="block text-sm font-medium text-zinc-400 mb-1">Access Key / Username</label>
