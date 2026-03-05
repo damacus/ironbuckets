@@ -15,10 +15,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// mockRenderer implements echo.Renderer for testing
-type mockRenderer struct{}
+// dashboardMockRenderer implements echo.Renderer for testing
+type dashboardMockRenderer struct{}
 
-func (m *mockRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+func (m *dashboardMockRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	// Simple JSON-like serialization for tests to assert contents without HTML formatting
 	d, err := json.Marshal(data)
 	if err == nil {
@@ -119,10 +119,29 @@ func (m *mockMinioAdminClient) UpdateGroupMembers(ctx context.Context, req madmi
 func (m *mockMinioAdminClient) SetGroupStatus(ctx context.Context, group string, status madmin.GroupStatus) error {
 	return nil
 }
+func (m *mockMinioAdminClient) ListAccessKeysBulk(ctx context.Context, users []string, opts madmin.ListAccessKeysOpts) (map[string]madmin.ListAccessKeysResp, error) {
+	if m.serviceAccsErr != nil {
+		return nil, m.serviceAccsErr
+	}
+	resp := make(map[string]madmin.ListAccessKeysResp)
+	var svcAccs []madmin.ServiceAccountInfo
+	for _, sa := range m.serviceAccounts.Accounts {
+		svcAccs = append(svcAccs, madmin.ServiceAccountInfo{
+			AccessKey:     sa.AccessKey,
+			AccountStatus: sa.AccountStatus,
+		})
+	}
+	for _, u := range users {
+		resp[u] = madmin.ListAccessKeysResp{
+			ServiceAccounts: svcAccs,
+		}
+	}
+	return resp, nil
+}
 
 func TestGetStorageWidget(t *testing.T) {
 	e := echo.New()
-	e.Renderer = &mockRenderer{}
+	e.Renderer = &dashboardMockRenderer{}
 
 	tests := []struct {
 		name          string
@@ -225,7 +244,7 @@ func TestGetStorageWidget(t *testing.T) {
 
 func TestGetUsersWidget(t *testing.T) {
 	e := echo.New()
-	e.Renderer = &mockRenderer{}
+	e.Renderer = &dashboardMockRenderer{}
 
 	tests := []struct {
 		name                string
@@ -423,7 +442,7 @@ func TestGetServerVersion(t *testing.T) {
 
 func TestGetServerWidget(t *testing.T) {
 	e := echo.New()
-	e.Renderer = &mockRenderer{}
+	e.Renderer = &dashboardMockRenderer{}
 
 	tests := []struct {
 		name          string

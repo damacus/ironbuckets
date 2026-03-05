@@ -75,6 +75,11 @@ func (m *MockMinioClient) ListServiceAccounts(ctx context.Context, user string) 
 	return args.Get(0).(madmin.ListServiceAccountsResp), args.Error(1)
 }
 
+func (m *MockMinioClient) ListAccessKeysBulk(ctx context.Context, users []string, opts madmin.ListAccessKeysOpts) (map[string]madmin.ListAccessKeysResp, error) {
+	args := m.Called(ctx, users, opts)
+	return args.Get(0).(map[string]madmin.ListAccessKeysResp), args.Error(1)
+}
+
 func (m *MockMinioClient) AddServiceAccount(ctx context.Context, opts madmin.AddServiceAccountReq) (madmin.Credentials, error) {
 	args := m.Called(ctx, opts)
 	return args.Get(0).(madmin.Credentials), args.Error(1)
