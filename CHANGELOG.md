@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.4.0](https://github.com/damacus/ironbuckets/compare/v1.3.0...v1.4.0) (2026-05-06)
+
+
+### Features
+
+* add request timeout middleware for handlers ([#24](https://github.com/damacus/ironbuckets/issues/24)) ([2ee13be](https://github.com/damacus/ironbuckets/commit/2ee13bec5afd7d140cf81852a6d9334dcdac59c4))
+* gate OIDC routes behind explicit configuration ([#21](https://github.com/damacus/ironbuckets/issues/21)) ([d603113](https://github.com/damacus/ironbuckets/commit/d603113756021043756dc4fbd9568aa19301b38b))
+
+
+### Bug Fixes
+
+* correct object pagination truncation detection ([#19](https://github.com/damacus/ironbuckets/issues/19)) ([702ab63](https://github.com/damacus/ironbuckets/commit/702ab6379c386feabd57223b18f21a1f23a664f6))
+* **deps:** update module github.com/minio/minio-go/v7 to v7.1.0 ([#37](https://github.com/damacus/ironbuckets/issues/37)) ([694e032](https://github.com/damacus/ironbuckets/commit/694e032d10b6432f75a9804771153ec0793234da))
+* enforce S3-compatible bucket naming rules ([#18](https://github.com/damacus/ironbuckets/issues/18)) ([1c28daa](https://github.com/damacus/ironbuckets/commit/1c28daa25a261f775cbf8aa117dd80d6b0bef9c8))
+* harden invalid cookie clearing and upload filename handling ([#16](https://github.com/damacus/ironbuckets/issues/16)) ([20531dd](https://github.com/damacus/ironbuckets/commit/20531dd26596b44f3b3849b8118589daf18d7381))
+* use localhost as default MinIO endpoint ([#22](https://github.com/damacus/ironbuckets/issues/22)) ([adeb4fa](https://github.com/damacus/ironbuckets/commit/adeb4fae7a268f2c32e01d7d0f42714ebf4aec0c))
+* validate object key input for object operations ([#17](https://github.com/damacus/ironbuckets/issues/17)) ([d99cb55](https://github.com/damacus/ironbuckets/commit/d99cb555e9f09c5a347bf462f153316a0dbf1b9a))
+
 ## [1.3.0](https://github.com/damacus/ironbuckets/compare/v1.2.1...v1.3.0) (2026-02-10)
 
 
