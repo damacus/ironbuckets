@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/damacus/ironbuckets/compare/v1.4.1...v1.4.2) (2026-05-06)
+
+
+### Bug Fixes
+
+* publish release assets before immutable release ([1f1dfa3](https://github.com/damacus/ironbuckets/commit/1f1dfa31dd2af9cfc62bea76bc37a09c463c6d4b))
+
 ## [1.4.1](https://github.com/damacus/ironbuckets/compare/v1.4.0...v1.4.1) (2026-05-06)
 
 
