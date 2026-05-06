@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"context"
-	"strings"
-	"net/url"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/damacus/iron-buckets/internal/services"
@@ -19,44 +19,91 @@ import (
 )
 
 type groupsTestAdminClient struct {
-	listGroupsResponse        []string
-	getGroupDescResponse      *madmin.GroupDesc
-	listUsersResponse         map[string]madmin.UserInfo
-	listCannedPoliciesResp    map[string]json.RawMessage
+	listGroupsResponse     []string
+	getGroupDescResponse   *madmin.GroupDesc
+	listUsersResponse      map[string]madmin.UserInfo
+	listCannedPoliciesResp map[string]json.RawMessage
 
-	updateGroupMembersCalls   []madmin.GroupAddRemove
-	setGroupStatusCalls       []struct{group string; status madmin.GroupStatus}
-	setPolicyCalls            []struct{policyName, entityName string; isGroup bool}
+	updateGroupMembersCalls []madmin.GroupAddRemove
+	setGroupStatusCalls     []struct {
+		group  string
+		status madmin.GroupStatus
+	}
+	setPolicyCalls []struct {
+		policyName, entityName string
+		isGroup                bool
+	}
 }
 
-func (m *groupsTestAdminClient) ServerInfo(ctx context.Context, opts ...func(*madmin.ServerInfoOpts)) (madmin.InfoMessage, error) { panic("unexpected") }
-func (m *groupsTestAdminClient) ListUsers(ctx context.Context) (map[string]madmin.UserInfo, error) { return m.listUsersResponse, nil }
-func (m *groupsTestAdminClient) AddUser(ctx context.Context, accessKey, secretKey string) error { panic("unexpected") }
-func (m *groupsTestAdminClient) RemoveUser(ctx context.Context, accessKey string) error { panic("unexpected") }
+func (m *groupsTestAdminClient) ServerInfo(ctx context.Context, opts ...func(*madmin.ServerInfoOpts)) (madmin.InfoMessage, error) {
+	panic("unexpected")
+}
+func (m *groupsTestAdminClient) ListUsers(ctx context.Context) (map[string]madmin.UserInfo, error) {
+	return m.listUsersResponse, nil
+}
+func (m *groupsTestAdminClient) AddUser(ctx context.Context, accessKey, secretKey string) error {
+	panic("unexpected")
+}
+func (m *groupsTestAdminClient) RemoveUser(ctx context.Context, accessKey string) error {
+	panic("unexpected")
+}
 func (m *groupsTestAdminClient) SetPolicy(ctx context.Context, policyName, entityName string, isGroup bool) error {
-	m.setPolicyCalls = append(m.setPolicyCalls, struct{policyName, entityName string; isGroup bool}{policyName, entityName, isGroup})
+	m.setPolicyCalls = append(m.setPolicyCalls, struct {
+		policyName, entityName string
+		isGroup                bool
+	}{policyName, entityName, isGroup})
 	return nil
 }
-func (m *groupsTestAdminClient) SetUserStatus(ctx context.Context, accessKey string, status madmin.AccountStatus) error { panic("unexpected") }
+func (m *groupsTestAdminClient) SetUserStatus(ctx context.Context, accessKey string, status madmin.AccountStatus) error {
+	panic("unexpected")
+}
 func (m *groupsTestAdminClient) ServiceRestart(ctx context.Context) error { panic("unexpected") }
-func (m *groupsTestAdminClient) DataUsageInfo(ctx context.Context) (madmin.DataUsageInfo, error) { panic("unexpected") }
+func (m *groupsTestAdminClient) DataUsageInfo(ctx context.Context) (madmin.DataUsageInfo, error) {
+	panic("unexpected")
+}
 func (m *groupsTestAdminClient) GetConfig(ctx context.Context) ([]byte, error) { panic("unexpected") }
-func (m *groupsTestAdminClient) ListServiceAccounts(ctx context.Context, user string) (madmin.ListServiceAccountsResp, error) { panic("unexpected") }
-func (m *groupsTestAdminClient) AddServiceAccount(ctx context.Context, opts madmin.AddServiceAccountReq) (madmin.Credentials, error) { panic("unexpected") }
-func (m *groupsTestAdminClient) DeleteServiceAccount(ctx context.Context, serviceAccount string) error { panic("unexpected") }
-func (m *groupsTestAdminClient) ListCannedPolicies(ctx context.Context) (map[string]json.RawMessage, error) { return m.listCannedPoliciesResp, nil }
-func (m *groupsTestAdminClient) InfoCannedPolicyV2(ctx context.Context, policyName string) (*madmin.PolicyInfo, error) { panic("unexpected") }
-func (m *groupsTestAdminClient) GetLogs(ctx context.Context, node string, lineCnt int, logKind string) <-chan madmin.LogInfo { panic("unexpected") }
-func (m *groupsTestAdminClient) GetBucketQuota(ctx context.Context, bucket string) (madmin.BucketQuota, error) { panic("unexpected") }
-func (m *groupsTestAdminClient) SetBucketQuota(ctx context.Context, bucket string, quota *madmin.BucketQuota) error { panic("unexpected") }
-func (m *groupsTestAdminClient) ListGroups(ctx context.Context) ([]string, error) { return m.listGroupsResponse, nil }
-func (m *groupsTestAdminClient) GetGroupDescription(ctx context.Context, group string) (*madmin.GroupDesc, error) { return m.getGroupDescResponse, nil }
+func (m *groupsTestAdminClient) ListServiceAccounts(ctx context.Context, user string) (madmin.ListServiceAccountsResp, error) {
+	panic("unexpected")
+}
+func (m *groupsTestAdminClient) ListAccessKeysBulk(ctx context.Context, users []string, opts madmin.ListAccessKeysOpts) (map[string]madmin.ListAccessKeysResp, error) {
+	panic("unexpected")
+}
+func (m *groupsTestAdminClient) AddServiceAccount(ctx context.Context, opts madmin.AddServiceAccountReq) (madmin.Credentials, error) {
+	panic("unexpected")
+}
+func (m *groupsTestAdminClient) DeleteServiceAccount(ctx context.Context, serviceAccount string) error {
+	panic("unexpected")
+}
+func (m *groupsTestAdminClient) ListCannedPolicies(ctx context.Context) (map[string]json.RawMessage, error) {
+	return m.listCannedPoliciesResp, nil
+}
+func (m *groupsTestAdminClient) InfoCannedPolicyV2(ctx context.Context, policyName string) (*madmin.PolicyInfo, error) {
+	panic("unexpected")
+}
+func (m *groupsTestAdminClient) GetLogs(ctx context.Context, node string, lineCnt int, logKind string) <-chan madmin.LogInfo {
+	panic("unexpected")
+}
+func (m *groupsTestAdminClient) GetBucketQuota(ctx context.Context, bucket string) (madmin.BucketQuota, error) {
+	panic("unexpected")
+}
+func (m *groupsTestAdminClient) SetBucketQuota(ctx context.Context, bucket string, quota *madmin.BucketQuota) error {
+	panic("unexpected")
+}
+func (m *groupsTestAdminClient) ListGroups(ctx context.Context) ([]string, error) {
+	return m.listGroupsResponse, nil
+}
+func (m *groupsTestAdminClient) GetGroupDescription(ctx context.Context, group string) (*madmin.GroupDesc, error) {
+	return m.getGroupDescResponse, nil
+}
 func (m *groupsTestAdminClient) UpdateGroupMembers(ctx context.Context, req madmin.GroupAddRemove) error {
 	m.updateGroupMembersCalls = append(m.updateGroupMembersCalls, req)
 	return nil
 }
 func (m *groupsTestAdminClient) SetGroupStatus(ctx context.Context, group string, status madmin.GroupStatus) error {
-	m.setGroupStatusCalls = append(m.setGroupStatusCalls, struct{group string; status madmin.GroupStatus}{group, status})
+	m.setGroupStatusCalls = append(m.setGroupStatusCalls, struct {
+		group  string
+		status madmin.GroupStatus
+	}{group, status})
 	return nil
 }
 
@@ -205,7 +252,6 @@ func TestViewGroup_Success(t *testing.T) {
 	assert.Len(t, policies, 1)
 	assert.Contains(t, policies, "readwrite")
 }
-
 
 func TestCreateGroup_Success(t *testing.T) {
 	e := echo.New()
@@ -359,7 +405,7 @@ func TestEnableGroup_Success(t *testing.T) {
 	assert.Equal(t, "/groups", rec.Header().Get("HX-Redirect"))
 }
 
-func TestAttachPolicy_Success(t *testing.T) {
+func TestAttachGroupPolicy_Success(t *testing.T) {
 	e := echo.New()
 	form := url.Values{}
 	form.Set("policy", "readwrite")
