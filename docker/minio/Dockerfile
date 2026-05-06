@@ -1,10 +1,13 @@
-FROM golang:1.25-alpine
-ARG MINIO_VERSION=latest
+FROM alpine:3.22
+ARG TARGETARCH
 ARG MINIO_ROOT_USER=minioadmin
 ARG MINIO_ROOT_PASSWORD=minioadmin
 
-RUN go install github.com/minio/minio@${MINIO_VERSION} && \
-    go install github.com/minio/mc@latest && \
+RUN apk add --no-cache ca-certificates wget && \
+    case "${TARGETARCH}" in amd64|arm64) ;; *) echo "unsupported architecture: ${TARGETARCH}" && exit 1 ;; esac && \
+    wget -q -O /usr/local/bin/minio "https://dl.min.io/server/minio/release/linux-${TARGETARCH}/minio" && \
+    wget -q -O /usr/local/bin/mc "https://dl.min.io/client/mc/release/linux-${TARGETARCH}/mc" && \
+    chmod +x /usr/local/bin/minio /usr/local/bin/mc && \
     adduser -D -u 1000 minio && \
     mkdir -p /data && \
     chown -R minio:minio /data
