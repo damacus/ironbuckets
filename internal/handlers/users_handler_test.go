@@ -84,6 +84,10 @@ func (m *mockUsersAdminClient) ListServiceAccounts(ctx context.Context, user str
 	return m.listServiceAccountsResp, m.listServiceAccountsErr
 }
 
+func (m *mockUsersAdminClient) ListAccessKeysBulk(ctx context.Context, users []string, opts madmin.ListAccessKeysOpts) (map[string]madmin.ListAccessKeysResp, error) {
+	return nil, nil
+}
+
 func (m *mockUsersAdminClient) AddServiceAccount(ctx context.Context, opts madmin.AddServiceAccountReq) (madmin.Credentials, error) {
 	return m.addServiceAccountResp, m.addServiceAccountErr
 }
