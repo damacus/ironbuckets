@@ -5,6 +5,7 @@ go 1.24.3
 require (
 	github.com/labstack/echo/v4 v4.15.0
 	github.com/minio/madmin-go/v3 v3.0.110
+	github.com/minio/madmin-go/v4 v4.10.0
 	github.com/minio/minio-go/v7 v7.0.97
 	github.com/stretchr/testify v1.11.1
 )
