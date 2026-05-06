@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/damacus/ironbuckets/compare/v1.4.0...v1.4.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* resolve echo v4.15.2 update conflicts ([#35](https://github.com/damacus/ironbuckets/issues/35)) ([21a4ab8](https://github.com/damacus/ironbuckets/commit/21a4ab8464838c5f5c23ae69fd6801593699234b))
+
 ## [1.4.0](https://github.com/damacus/ironbuckets/compare/v1.3.0...v1.4.0) (2026-05-06)
 
 
