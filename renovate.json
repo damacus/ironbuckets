@@ -2,8 +2,8 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>damacus/renovate-config",
-    "github>damacus/renovate-config:autoMergeGitHubActions",
-    "github>damacus/renovate-config:autoMergeDocker"
+    "github>damacus/renovate-config:autoMergeGitHubActions.json5",
+    "github>damacus/renovate-config:autoMergeDocker.json5"
   ],
   "packageRules": [
     {
