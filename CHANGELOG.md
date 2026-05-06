@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.3](https://github.com/damacus/ironbuckets/compare/v1.4.2...v1.4.3) (2026-05-06)
+
+
+### Bug Fixes
+
+* speed up minio release image build ([88d3e05](https://github.com/damacus/ironbuckets/commit/88d3e0592d53ad97db77dbff26d2f1c5266fb239))
+
 ## [1.4.2](https://github.com/damacus/ironbuckets/compare/v1.4.1...v1.4.2) (2026-05-06)
 
 
