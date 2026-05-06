@@ -60,6 +60,10 @@ func (m *groupsTestAdminClient) SetGroupStatus(ctx context.Context, group string
 	return nil
 }
 
+func (m *groupsTestAdminClient) ListAccessKeysBulk(ctx context.Context, users []string, opts madmin.ListAccessKeysOpts) (map[string]madmin.ListAccessKeysResp, error) {
+	return nil, nil
+}
+
 type groupsTestFactory struct {
 	adminClient services.MinioAdminClient
 }
@@ -359,7 +363,7 @@ func TestEnableGroup_Success(t *testing.T) {
 	assert.Equal(t, "/groups", rec.Header().Get("HX-Redirect"))
 }
 
-func TestAttachPolicy_Success(t *testing.T) {
+func TestGroupAttachPolicy_Success(t *testing.T) {
 	e := echo.New()
 	form := url.Values{}
 	form.Set("policy", "readwrite")

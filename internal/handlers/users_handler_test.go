@@ -92,6 +92,10 @@ func (m *mockUsersAdminClient) DeleteServiceAccount(ctx context.Context, service
 	return m.deleteServiceAccountErr
 }
 
+func (m *mockUsersAdminClient) ListAccessKeysBulk(ctx context.Context, users []string, opts madmin.ListAccessKeysOpts) (map[string]madmin.ListAccessKeysResp, error) {
+	return nil, nil
+}
+
 func (m *mockUsersAdminClient) ListCannedPolicies(ctx context.Context) (map[string]json.RawMessage, error) {
 	return m.listCannedPoliciesResp, m.listCannedPoliciesErr
 }
@@ -576,7 +580,7 @@ func TestListPolicies_MinioError(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, httpErr.Code)
 }
 
-func TestAttachPolicy_Success(t *testing.T) {
+func TestUserAttachPolicy_Success(t *testing.T) {
 	adminClient := &mockUsersAdminClient{}
 	factory := &mockUsersFactory{adminClient: adminClient}
 	handler := NewUsersHandler(factory)
