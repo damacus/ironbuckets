@@ -1,0 +1,8 @@
+{
+  "release-type": "go",
+  "draft": true,
+  "force-tag-creation": true,
+  "packages": {
+    ".": {}
+  }
+}

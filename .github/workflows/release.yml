@@ -30,7 +30,8 @@ jobs:
         uses: googleapis/release-please-action@v5
         with:
           token: ${{ steps.generate_token.outputs.token }}
-          release-type: go
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
 
   build:
     name: Build and Upload Assets
@@ -88,6 +89,12 @@ jobs:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
           gh release upload ${{ needs.release-please.outputs.tag_name }} dist/*
+
+      - name: Publish Release
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: |
+          gh release edit ${{ needs.release-please.outputs.tag_name }} --draft=false
 
   docker:
     name: Build and Push Container Images
