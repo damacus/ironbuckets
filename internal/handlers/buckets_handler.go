@@ -135,6 +135,16 @@ func (h *BucketsHandler) CreateBucket(c echo.Context) error {
 	return HTMXRedirect(c, "/buckets")
 }
 
+func isValidObjectKey(key string) bool {
+	if strings.Contains(key, "..") {
+		return false
+	}
+	if strings.HasPrefix(key, "/") {
+		return false
+	}
+	return true
+}
+
 func isValidBucketName(name string) bool {
 	if len(name) < 3 || len(name) > 63 {
 		return false
@@ -296,6 +306,10 @@ func (h *BucketsHandler) UploadObject(c echo.Context) error {
 
 	// Put Object with prefix support
 	filename := filepath.Base(file.Filename)
+	if prefix != "" && !isValidObjectKey(prefix) {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid prefix")
+	}
+
 	if filename == "" || filename == "." || strings.Contains(file.Filename, "..") {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid file name")
 	}
@@ -325,6 +339,10 @@ func (h *BucketsHandler) DeleteObject(c echo.Context) error {
 
 	bucketName := c.Param("bucketName")
 	objectName := c.QueryParam("key")
+	if !isValidObjectKey(objectName) {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid object key")
+	}
+
 	if strings.TrimSpace(objectName) == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Object key is required")
 	}
@@ -350,6 +368,10 @@ func (h *BucketsHandler) DownloadObject(c echo.Context) error {
 
 	bucketName := c.Param("bucketName")
 	objectName := c.QueryParam("key")
+	if !isValidObjectKey(objectName) {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid object key")
+	}
+
 	if strings.TrimSpace(objectName) == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Object key is required")
 	}
@@ -397,6 +419,10 @@ func (h *BucketsHandler) CreateFolder(c echo.Context) error {
 	bucketName := c.Param("bucketName")
 	prefix := c.QueryParam("prefix")
 	folderName := c.FormValue("folderName")
+
+	if !isValidObjectKey(folderName) || (prefix != "" && !isValidObjectKey(prefix)) {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid folder name or prefix")
+	}
 
 	if folderName == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Folder name is required")
