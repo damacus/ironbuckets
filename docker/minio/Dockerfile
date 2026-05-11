@@ -1,7 +1,5 @@
 FROM alpine:3.23
 ARG TARGETARCH
-ARG MINIO_ROOT_USER=minioadmin
-ARG MINIO_ROOT_PASSWORD=minioadmin
 
 RUN apk add --no-cache ca-certificates wget && \
     case "${TARGETARCH}" in amd64|arm64) ;; *) echo "unsupported architecture: ${TARGETARCH}" && exit 1 ;; esac && \
@@ -12,7 +10,6 @@ RUN apk add --no-cache ca-certificates wget && \
     mkdir -p /data && \
     chown -R minio:minio /data
 
-ENV MC_HOST_local=http://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@localhost:9000
 
 USER minio
 EXPOSE 9000 9001
