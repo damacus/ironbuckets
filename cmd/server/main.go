@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/damacus/iron-buckets/internal/handlers"
 	customMiddleware "github.com/damacus/iron-buckets/internal/middleware"
