@@ -57,7 +57,10 @@ func (h *BucketsHandler) ListBuckets(c echo.Context) error {
 	mdm, err := h.minioFactory.NewAdminClient(*creds)
 	var usage madmin.DataUsageInfo
 	if err == nil {
-		usage, _ = mdm.DataUsageInfo(c.Request().Context())
+		var usageErr error
+		if usage, usageErr = mdm.DataUsageInfo(c.Request().Context()); usageErr != nil {
+			c.Logger().Warnf("Failed to fetch data usage info: %v", usageErr)
+		}
 	}
 
 	type BucketWithStats struct {
