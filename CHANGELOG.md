@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.4.4](https://github.com/damacus/ironbuckets/compare/v1.4.3...v1.4.4) (2026-08-22)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/labstack/echo/v4 to v4.15.3 ([#69](https://github.com/damacus/ironbuckets/issues/69)) ([5bad780](https://github.com/damacus/ironbuckets/commit/5bad780d9a5ac47edbc1e14836dc62b5494c578a))
+* **deps:** update module github.com/labstack/echo/v4 to v4.15.4 ([#71](https://github.com/damacus/ironbuckets/issues/71)) ([6cbad0d](https://github.com/damacus/ironbuckets/commit/6cbad0d03fedc8d8b73c8ba449507b61dfd40a79))
+* **deps:** update module github.com/labstack/echo/v4 to v5 ([#58](https://github.com/damacus/ironbuckets/issues/58)) ([f0bdf0d](https://github.com/damacus/ironbuckets/commit/f0bdf0d457263e1937bb2cfcd83c625ac8f5fbc0))
+* **deps:** update module github.com/labstack/echo/v5 to v5.2.0 ([#70](https://github.com/damacus/ironbuckets/issues/70)) ([f60bb83](https://github.com/damacus/ironbuckets/commit/f60bb83da42185ac3acf4a81ad9245a12378cd68))
+* **deps:** update module github.com/labstack/echo/v5 to v5.2.1 ([#72](https://github.com/damacus/ironbuckets/issues/72)) ([ff7505f](https://github.com/damacus/ironbuckets/commit/ff7505fe2f428f0597b5572640222ca6301f4168))
+* **deps:** update module github.com/labstack/echo/v5 to v5.3.0 ([#75](https://github.com/damacus/ironbuckets/issues/75)) ([3ad61f8](https://github.com/damacus/ironbuckets/commit/3ad61f8485c55841afb493b9ab24b74cffbf248b))
+* **deps:** update module github.com/labstack/echo/v5 to v5.3.1 ([#79](https://github.com/damacus/ironbuckets/issues/79)) ([88ffedc](https://github.com/damacus/ironbuckets/commit/88ffedc3ab3c877110332e4c62947f43422ad533))
+* **deps:** update module github.com/minio/minio-go/v7 to v7.2.0 ([#67](https://github.com/damacus/ironbuckets/issues/67)) ([ee2bfd8](https://github.com/damacus/ironbuckets/commit/ee2bfd83b36abccef1813616774efb6ed3a32bf5))
+* **deps:** update module github.com/minio/minio-go/v7 to v7.2.1 ([#74](https://github.com/damacus/ironbuckets/issues/74)) ([de2caaf](https://github.com/damacus/ironbuckets/commit/de2caaf80410a48a7bed79b3b63c6cb24178da70))
+* **deps:** update module github.com/minio/minio-go/v7 to v7.3.0 ([#80](https://github.com/damacus/ironbuckets/issues/80)) ([4b327df](https://github.com/damacus/ironbuckets/commit/4b327df3594a8f13544549a66be3a23434f6ff99))
+* **deps:** update module github.com/stretchr/testify to v1.12.0 ([#81](https://github.com/damacus/ironbuckets/issues/81)) ([318c832](https://github.com/damacus/ironbuckets/commit/318c832346172ec84a700550f2a9b2340926c48c))
+* **deps:** update module github.com/stretchr/testify to v1.12.1 ([#82](https://github.com/damacus/ironbuckets/issues/82)) ([1e65913](https://github.com/damacus/ironbuckets/commit/1e65913054c6e8714f6b50bd18632cdd5b4680df))
+* **handlers:** do not ignore mdm.DataUsageInfo error in buckets handler ([#63](https://github.com/damacus/ironbuckets/issues/63)) ([7626705](https://github.com/damacus/ironbuckets/commit/76267052afb49e6e597d5f2173acf9b99ec9cf39))
+* **security:** prevent path traversal in object keys and folder creation ([#64](https://github.com/damacus/ironbuckets/issues/64)) ([d0464ff](https://github.com/damacus/ironbuckets/commit/d0464ff1264936975b594a62a0cd7b02d4294c7d))
+
 ## [1.4.3](https://github.com/damacus/ironbuckets/compare/v1.4.2...v1.4.3) (2026-05-06)
 
 
