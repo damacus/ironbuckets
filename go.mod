@@ -3,7 +3,7 @@ module github.com/damacus/iron-buckets
 go 1.25.0
 
 require (
-	github.com/labstack/echo/v4 v4.15.4
+	github.com/labstack/echo/v5 v5.3.1
 	github.com/labstack/echo/v5 v5.3.1
 	github.com/minio/madmin-go/v3 v3.0.110
 	github.com/minio/minio-go/v7 v7.3.0
