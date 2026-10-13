@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.4.5](https://github.com/damacus/ironbuckets/compare/v1.4.4...v1.4.5) (2026-10-13)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/labstack/echo/v4 to v4.16.0 ([#84](https://github.com/damacus/ironbuckets/issues/84)) ([ccbbc91](https://github.com/damacus/ironbuckets/commit/ccbbc91819fa6b428d3ae9db1325d067544cd2f2))
+* **deps:** update module github.com/labstack/echo/v5 to v5.4.0 ([#85](https://github.com/damacus/ironbuckets/issues/85)) ([c453fb8](https://github.com/damacus/ironbuckets/commit/c453fb8030318274ad68e52a593076d5c9631d0f))
+* **deps:** update module github.com/minio/minio-go/v7 to v7.4.1 ([#88](https://github.com/damacus/ironbuckets/issues/88)) ([07de0e3](https://github.com/damacus/ironbuckets/commit/07de0e34cc871bd19db3faa7fbb992ffa19b96dc))
+
 ## [1.4.4](https://github.com/damacus/ironbuckets/compare/v1.4.3...v1.4.4) (2026-08-22)
 
 
