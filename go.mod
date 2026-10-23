@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/labstack/echo/v4 v4.16.1
-	github.com/labstack/echo/v5 v5.4.1
+	github.com/labstack/echo/v5 v5.4.2
 	github.com/minio/madmin-go/v3 v3.0.110
 	github.com/minio/minio-go/v7 v7.4.1
 	github.com/stretchr/testify v1.12.1
