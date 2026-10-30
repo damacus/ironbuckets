@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.4.5](https://github.com/damacus/ironbuckets/compare/v1.4.4...v1.4.5) (2026-10-30)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/labstack/echo/v4 to v4.16.0 ([#84](https://github.com/damacus/ironbuckets/issues/84)) ([ccbbc91](https://github.com/damacus/ironbuckets/commit/ccbbc91819fa6b428d3ae9db1325d067544cd2f2))
+* **deps:** update module github.com/labstack/echo/v4 to v4.16.1 ([#89](https://github.com/damacus/ironbuckets/issues/89)) ([da33db5](https://github.com/damacus/ironbuckets/commit/da33db5bb2c58815aac1516d8754a44cda862788))
+* **deps:** update module github.com/labstack/echo/v4 to v4.16.2 ([#91](https://github.com/damacus/ironbuckets/issues/91)) ([7a41730](https://github.com/damacus/ironbuckets/commit/7a417305160f583e09377f440e3c0caf9be427ad))
+* **deps:** update module github.com/labstack/echo/v4 to v4.16.3 ([#94](https://github.com/damacus/ironbuckets/issues/94)) ([0b69222](https://github.com/damacus/ironbuckets/commit/0b69222483d3214f1fd748008cd928b9d639b2bc))
+* **deps:** update module github.com/labstack/echo/v5 to v5.4.0 ([#85](https://github.com/damacus/ironbuckets/issues/85)) ([c453fb8](https://github.com/damacus/ironbuckets/commit/c453fb8030318274ad68e52a593076d5c9631d0f))
+* **deps:** update module github.com/labstack/echo/v5 to v5.4.1 ([#90](https://github.com/damacus/ironbuckets/issues/90)) ([31c93ca](https://github.com/damacus/ironbuckets/commit/31c93ca8000e6e9569f3516fed6b03774925c68d))
+* **deps:** update module github.com/labstack/echo/v5 to v5.4.2 ([#92](https://github.com/damacus/ironbuckets/issues/92)) ([ddaa99f](https://github.com/damacus/ironbuckets/commit/ddaa99ff0ec6a5a78655e063a6a4b2fb5254c849))
+* **deps:** update module github.com/labstack/echo/v5 to v5.4.4 ([#95](https://github.com/damacus/ironbuckets/issues/95)) ([f96ea4c](https://github.com/damacus/ironbuckets/commit/f96ea4ca234a747f7f92a554ed1fefa3968d33b7))
+* **deps:** update module github.com/minio/minio-go/v7 to v7.4.1 ([#88](https://github.com/damacus/ironbuckets/issues/88)) ([07de0e3](https://github.com/damacus/ironbuckets/commit/07de0e34cc871bd19db3faa7fbb992ffa19b96dc))
+
 ## [1.4.4](https://github.com/damacus/ironbuckets/compare/v1.4.3...v1.4.4) (2026-08-22)
 
 
